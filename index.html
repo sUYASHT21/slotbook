@@ -1,0 +1,1708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Slotbook</title>
+<meta name="description" content="Slotbook: plan your VIT FFCS timetable for Winter 2026-27. See every slot on the weekly grid, pick one faculty per course and get every clash-free timetable.">
+<meta name="theme-color" content="#F6F8FE">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect x='10' y='5' width='28' height='34' rx='4' fill='%23FFD93D' stroke='%231D2340' stroke-width='2.2'/%3E%3Crect x='15' y='12' width='17' height='5' rx='2.5' fill='%23FF5C8D'/%3E%3Cpath d='M16 23h15M16 29h10M6 11h7M6 18h7M6 25h7M6 32h7' fill='none' stroke='%231D2340' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Lexend:wght@300;400;500;600;700&display=swap">
+<style>
+/* Layout: a graph-paper student notebook. Two divider tabs switch tools; each tool sits on taped-down sheets and picked slots get highlighter ink. */
+:root{
+  --paper:#F6F8FE;
+  --grid-line:#E1E7F5;
+  --sheet:#FFFFFF;
+  --sheet-2:#F8FAFE;
+  --ink:#1D2340;
+  --ink-2:#4A5375;
+  --ink-3:#5F6889;
+  --ink-4:#A9B0C8;
+  --rule:#D4DBEC;
+  --rule-2:#EBEFF8;
+  --sun:#FFD93D; --sun-soft:#FFF4BF;
+  --berry:#FF5C8D; --berry-soft:#FFDCE8; --berry-ink:#C2255C;
+  --mint:#3DDBA0; --mint-soft:#D2F7E7; --mint-ink:#0B7A55;
+  --sky:#3FA2F6; --sky-mid:#9AD0FF; --sky-soft:#DDEFFF;
+  --grape:#8B6CF6; --grape-mid:#C6B3FF; --grape-soft:#EEE8FF;
+  --tang:#FF8A3D; --tang-soft:#FFE6D1;
+  --c1:#FFE27A; --c2:#A7EBCF; --c3:#FFC2D7; --c4:#AFD9FF; --c5:#D6C8FF; --c6:#FFD0A6; --c7:#CFEFA3; --c8:#A6E6E9;
+  --font-hand:"Caveat","Segoe Print","Bradley Hand","Comic Sans MS",cursive;
+  --font-ui:"Lexend","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --wob:255px 18px 225px 18px/18px 225px 18px 255px;
+  --wob-2:18px 225px 18px 255px/255px 18px 225px 18px;
+  --sheet-r:22px 8px 20px 10px/10px 20px 8px 22px;
+  --lift:0 1px 0 rgba(29,35,64,.05),0 16px 32px -20px rgba(29,35,64,.38);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--paper)}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:24px 24px;
+  color:var(--ink);
+  font-family:var(--font-ui);
+  font-size:15px;
+  line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 56px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.wrap{max-width:1280px;margin-inline:auto}
+.hand{font-family:var(--font-hand)}
+.ic svg{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic.grip svg circle{fill:currentColor;stroke:none}
+
+/* ---------- top bar ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:22px 4px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:44px;height:44px;transform:rotate(-7deg);flex:none}
+.logo-cover{fill:var(--sun);stroke:var(--ink);stroke-width:2.2}
+.logo-hl{fill:var(--berry)}
+.logo-line{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round}
+.brand-name{display:block;font-family:var(--font-hand);font-weight:700;font-size:2.1rem;line-height:.9}
+.brand-sub{display:block;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.stamp{color:var(--berry-ink);border:2px dashed var(--berry);border-radius:12px 8px 12px 9px;padding:.3em .85em .35em;transform:rotate(4deg);text-align:center;line-height:1.1;background:color-mix(in srgb,var(--berry-soft) 55%,transparent)}
+.stamp span{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600}
+.stamp b{display:block;font-family:var(--font-hand);font-size:1.55rem;font-weight:700}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px 40px;align-items:center;padding-block:22px 30px}
+.hero-copy{position:relative;min-width:0}
+.hero h1{font-family:var(--font-hand);font-weight:700;font-size:clamp(2.7rem,6.4vw,4.6rem);line-height:.92;max-width:16ch}
+.hl{position:relative;z-index:0;white-space:nowrap}
+.hl::before{content:"";position:absolute;inset:.2em -.14em .04em -.1em;background:var(--sun);border-radius:.2em .55em .25em .5em;transform:rotate(-1.6deg) skewX(-8deg);z-index:-1}
+.hero p.lede{max-width:50ch;color:var(--ink-2);font-size:1.06rem;margin-top:16px}
+.star{position:absolute;width:44px;height:44px;left:min(30rem,78%);top:-14px;fill:var(--sun);stroke:var(--ink);stroke-width:2.2;stroke-linejoin:round;animation:twinkle 3.2s ease-in-out infinite}
+.star.s2{width:24px;height:24px;left:min(33rem,86%);top:34px;fill:var(--berry);animation-delay:-1.4s}
+@keyframes twinkle{0%,100%{transform:rotate(0) scale(1)}50%{transform:rotate(14deg) scale(1.12)}}
+.cheat{position:relative;width:300px;max-width:100%;background:var(--sun-soft);padding:24px 20px 16px;transform:rotate(2.2deg);border-radius:3px 3px 22px 3px;box-shadow:0 18px 26px -18px rgba(29,35,64,.5)}
+.cheat .pin{position:absolute;top:-10px;left:50%;width:20px;height:20px;border-radius:50%;background:var(--berry);border:2px solid var(--ink);transform:translateX(-50%);box-shadow:inset -3px -3px 0 rgba(0,0,0,.12)}
+.cheat h3{font-family:var(--font-hand);font-size:1.75rem;line-height:1;margin-bottom:10px}
+.cheat ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.cheat li{display:flex;justify-content:space-between;align-items:baseline;gap:14px;border-bottom:1.5px dashed rgba(29,35,64,.2);padding-bottom:5px;font-size:.84rem}
+.cheat li b{font-weight:600;font-variant-numeric:tabular-nums}
+.cheat li span{color:var(--ink-2)}
+.cheat p{font-family:var(--font-hand);font-size:1.3rem;line-height:1.05;margin-top:10px}
+
+/* ---------- divider tabs ---------- */
+.tabs{display:flex;gap:8px;align-items:flex-end;border-bottom:2.5px solid var(--ink);padding-inline:8px;margin-bottom:30px}
+.tab{font-family:var(--font-hand);font-weight:700;font-size:1.6rem;line-height:1;padding:.32em .85em .22em;border:2.5px solid var(--ink);border-bottom:0;border-radius:16px 22px 0 0;background:var(--t-soft);cursor:pointer;white-space:nowrap;transition:padding .15s,background .15s}
+.tab:hover{background:color-mix(in srgb,var(--t) 55%,var(--t-soft))}
+.tab[aria-selected="true"]{background:var(--t);padding-block:.5em .3em}
+.tab-planner{--t:var(--sun);--t-soft:var(--sun-soft)}
+.tab-slots{--t:var(--sky-mid);--t-soft:var(--sky-soft)}
+
+/* ---------- sheets ---------- */
+.sheet{position:relative;background:var(--sheet);border:2px solid var(--ink);border-radius:var(--sheet-r);padding:clamp(18px,2.6vw,30px);box-shadow:var(--lift);min-width:0}
+.tape{position:absolute;top:-14px;left:50%;width:112px;height:26px;transform:translateX(-50%) rotate(-2.5deg);background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--tape,var(--berry)) 62%,transparent) 0 7px,color-mix(in srgb,var(--tape,var(--berry)) 40%,transparent) 7px 14px);clip-path:polygon(3% 0,97% 0,100% 18%,96% 36%,100% 54%,96% 72%,100% 90%,97% 100%,3% 100%,0 82%,4% 64%,0 46%,4% 28%,0 10%);pointer-events:none}
+.tape.r{left:auto;right:28px;transform:rotate(3deg);width:90px}
+.tape.l{left:30px;transform:rotate(-4deg);width:90px}
+.card-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-bottom:16px}
+.card-title{font-family:var(--font-hand);font-weight:700;font-size:2.15rem;line-height:1;display:flex;align-items:center;gap:.35em}
+.step{display:inline-grid;place-items:center;width:1.45em;height:1.45em;flex:none;border:2px solid var(--ink);border-radius:var(--wob);font-size:.78em;background:var(--sun-soft);transform:rotate(-7deg)}
+.note{font-family:var(--font-hand);font-size:1.3rem;line-height:1.1;color:var(--ink-2)}
+.muted{color:var(--ink-3)}
+
+/* ---------- buttons, chips, fields ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;padding:.62em 1.15em;border:2px solid var(--ink);border-radius:var(--wob);background:var(--sheet);font-weight:600;font-size:.93rem;cursor:pointer;box-shadow:0 3px 0 var(--ink);transition:transform .12s,box-shadow .12s,background .15s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px) rotate(-.7deg);box-shadow:0 4px 0 var(--ink)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.btn-sun{background:var(--sun)}
+.btn-mint{background:var(--mint)}
+.btn-sky{background:var(--sky-mid)}
+.btn-soft{background:var(--berry-soft)}
+.btn-plain{box-shadow:none;border-style:dashed}
+.btn-plain:hover{box-shadow:none;background:var(--sheet-2)}
+.btn.armed{background:var(--berry);color:var(--sheet)}
+.linkbtn{border:0;background:none;padding:0;font-weight:600;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;text-decoration-color:var(--berry);cursor:pointer}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;border:2px solid var(--ink);border-radius:16px 10px 16px 12px;background:var(--sheet-2);max-width:100%}
+.seg button{border:0;background:transparent;padding:.42em .85em;border-radius:12px 8px 12px 9px;font-weight:600;font-size:.86rem;cursor:pointer;display:inline-flex;gap:.45em;align-items:center}
+.seg button:hover{background:var(--rule-2)}
+.seg button[aria-pressed="true"]{background:var(--seg,var(--sun));box-shadow:inset 0 0 0 2px var(--ink)}
+.seg .n{font-size:.72rem;background:var(--sheet);border:1.5px solid var(--ink);border-radius:99px;padding:0 .45em;font-variant-numeric:tabular-nums;line-height:1.4}
+.chip{border:1.5px solid var(--ink);border-radius:99px;padding:.28em .8em;font-size:.8rem;font-weight:500;background:var(--sheet);cursor:pointer;white-space:nowrap}
+.chip:hover{background:var(--sun-soft)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.chip .n{opacity:.7;font-variant-numeric:tabular-nums}
+.field{width:100%;padding:.68em .9em .68em 2.5em;border:2px solid var(--ink);border-radius:12px 7px 12px 8px;background:var(--sheet) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%231D2340' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='8.5' cy='8.5' r='5.5'/%3E%3Cpath d='M13 13l4 4'/%3E%3C/svg%3E") no-repeat .85em 50%/1.05em;font-size:.92rem}
+.field::placeholder{color:var(--ink-3)}
+.icon-btn{width:32px;height:32px;display:grid;place-items:center;border:1.5px solid var(--ink);border-radius:9px 7px 10px 6px;background:var(--sheet);cursor:pointer;flex:none;transition:background .12s,transform .12s}
+.icon-btn:hover{background:var(--sun-soft);transform:rotate(-4deg)}
+.icon-btn.danger:hover{background:var(--berry-soft)}
+.icon-btn:disabled{opacity:.28;cursor:default;transform:none;background:var(--sheet)}
+.tick{appearance:none;-webkit-appearance:none;width:22px;height:22px;margin:0;flex:none;border:2px solid var(--ink);border-radius:6px 8px 5px 7px;background:var(--sheet);cursor:pointer;display:grid;place-items:center}
+.tick:checked{background:var(--mint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%231D2340' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 10.5l3.6 3.5 7.4-8.5'/%3E%3C/svg%3E") center/16px no-repeat}
+.tag{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.02em;padding:.1em .6em;border-radius:99px;border:1.5px solid var(--ink);background:var(--sheet)}
+.tag.th{background:var(--sky-soft)}
+.tag.thlab{background:var(--sun-soft)}
+.tag.eth{background:var(--grape-soft)}
+.tag.lo{background:var(--mint-soft)}
+.tag.ss{background:var(--tang-soft)}
+.slot-chip{display:inline-block;font-weight:600;font-size:.76rem;padding:.08em .5em;border-radius:6px 4px 6px 5px;border:1.5px solid var(--ink);background:var(--sheet);font-variant-numeric:tabular-nums;white-space:nowrap}
+.slot-chip.m{background:var(--sun)}
+.slot-chip.e{background:var(--grape-mid)}
+.slot-chip.lab{background:var(--mint-soft);border-style:dashed}
+
+/* ---------- planner ---------- */
+.planner{display:grid;gap:40px}
+.planner-top{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:30px;align-items:start}
+.picker .seg{margin-bottom:14px;padding:5px;gap:5px}
+.picker .seg button{font-size:1.05rem;padding:.55em 1.05em}
+.picker .seg .n{font-size:.82rem;padding:0 .5em}
+.clash-badge{display:inline-flex;align-items:center;gap:3px;color:var(--berry-ink);font-weight:700;letter-spacing:.02em}
+.crow.blocked{background:var(--sheet-2)}
+.crow.blocked .crow-name{color:var(--ink-2)}
+.clist{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.crow{width:100%;text-align:left;display:grid;gap:4px;padding:12px 14px;border:1.5px solid var(--rule);border-radius:12px 9px 12px 10px;background:var(--sheet);cursor:pointer;transition:border-color .15s,transform .15s,background .15s}
+.crow:hover{border-color:var(--ink);transform:translateX(3px)}
+.crow.active{border:2px solid var(--ink);background:var(--sun-soft)}
+.crow-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.73rem;letter-spacing:.05em;color:var(--ink-3);font-weight:600}
+.crow-name{font-weight:600;font-size:.97rem;line-height:1.3}
+.crow-meta{display:flex;flex-wrap:wrap;gap:5px 10px;font-size:.78rem;color:var(--ink-2);align-items:center}
+.added{display:inline-flex;align-items:center;gap:3px;color:var(--mint-ink);font-weight:700;letter-spacing:.02em}
+.added .ic svg{width:14px;height:14px;stroke-width:2.6}
+.editing{display:inline-flex;align-items:center;gap:4px;color:var(--ink);font-family:var(--font-hand);font-size:1.1rem;letter-spacing:0}
+.no-match{padding:18px 4px;color:var(--ink-3)}
+.empty{display:grid;justify-items:start;gap:8px;padding:26px 8px 18px}
+.empty .big{font-family:var(--font-hand);font-weight:700;font-size:1.9rem;line-height:1}
+.empty p{max-width:46ch;color:var(--ink-2)}
+.empty svg{width:96px;height:56px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+.ed-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 16px;align-items:flex-start;padding-bottom:14px;border-bottom:2px dashed var(--rule)}
+.ed-codes{font-size:.74rem;color:var(--ink-3);letter-spacing:.06em;font-weight:600}
+.ed-head h3{font-size:1.28rem;font-weight:600;line-height:1.25;margin-top:2px}
+.ed-tags{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:8px;font-size:.8rem;color:var(--ink-2)}
+.ed-cred{font-family:var(--font-hand);font-weight:700;font-size:1.9rem;line-height:1;text-align:right}
+.ed-cred small{display:block;font-family:var(--font-ui);font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.ed-note{margin:14px 0 10px}
+.facs{display:grid;gap:10px}
+.fac{border:1.5px solid var(--rule);border-radius:12px 9px 12px 10px;background:var(--sheet);padding:12px 14px;transition:border-color .15s,background .15s}
+.fac:hover{border-color:var(--ink-3)}
+.fac.sel{border:2px solid var(--ink);background:var(--sun-soft);padding:11.5px 13.5px}
+.fac.bad{background:var(--sheet-2)}
+.fac.sel.bad{background:var(--berry-soft)}
+.fac-top{display:flex;align-items:center;gap:10px;cursor:pointer}
+.radio{appearance:none;-webkit-appearance:none;width:22px;height:22px;margin:0;flex:none;border:2px solid var(--ink);border-radius:50%;background:var(--sheet);cursor:pointer;display:grid;place-items:center}
+.radio::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--ink);transform:scale(0);transition:transform .12s}
+.radio:checked::after{transform:scale(1)}
+.fac-name{font-weight:600;font-size:.95rem;line-height:1.3;flex:1;min-width:0}
+.fit{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.15em .6em;border-radius:99px;border:1.5px solid currentColor;white-space:nowrap}
+.fit.ok{color:var(--mint-ink);background:var(--mint-soft)}
+.fit.bad{color:var(--berry-ink);background:var(--sheet)}
+.fac-secs{display:grid;gap:8px;margin:9px 0 0 32px}
+.fsec{display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center;font-size:.78rem;color:var(--ink-2)}
+.fsec.off > :not(.slot-chip){opacity:.45}
+.fsec .lbl{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--ink-3);margin-left:4px}
+button.slot-chip{cursor:pointer;font-family:inherit}
+button.slot-chip:hover{filter:brightness(.94)}
+.slot-chip.off{background:var(--sheet-2);text-decoration:line-through;border-style:dashed;color:var(--ink-3)}
+.clash-msg{margin:8px 0 0 32px;font-size:.82rem;color:var(--berry-ink);font-weight:500}
+.fac-hint{margin:8px 0 0 32px;font-size:.76rem;color:var(--ink-3)}
+.clash-box{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;border:2px solid var(--berry);border-radius:12px 9px 12px 10px;background:var(--berry-soft);font-size:.88rem}
+.clash-box .hand{font-size:1.45rem;font-weight:700;line-height:1;color:var(--berry-ink);white-space:nowrap}
+.mine.dragging{opacity:.35}
+.mine.drop{border-color:var(--ink);border-style:dashed;background:var(--sun-soft)}
+.grip{cursor:grab;color:var(--ink-4);padding-top:2px}
+.rank{font-family:var(--font-hand);font-weight:700;font-size:1.55rem;line-height:.9;text-align:center}
+.lab-chip{display:inline-flex;align-items:baseline;gap:5px;padding:.18em .6em;border:1.5px dashed var(--ink);border-radius:7px 5px 7px 6px;background:var(--mint-soft);font-size:.76rem;font-weight:600;font-variant-numeric:tabular-nums;font-family:inherit;color:var(--ink)}
+button.lab-chip{cursor:pointer}
+button.lab-chip:hover{background:var(--mint)}
+.lab-chip small{font-weight:400;color:var(--ink-2);font-size:.72rem}
+.lab-chip.off{background:var(--sheet-2);text-decoration:line-through;opacity:.55}
+.warn{font-size:.78rem;color:var(--berry-ink);font-weight:500}
+.ed-foot{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px;margin-top:18px}
+.ed-foot .count{font-size:.8rem;color:var(--ink-3);margin-left:auto}
+.btn.blocked{background:var(--rule-2);color:var(--ink-3);border-color:var(--ink-3);box-shadow:0 3px 0 var(--ink-3)}
+
+.example-note{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 14px;margin-bottom:14px;border:2px dashed var(--tang);border-radius:12px;background:var(--tang-soft);font-size:.88rem}
+.example-note .hand{font-size:1.35rem;font-weight:700;line-height:1}
+.mine-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.mine{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:11px 12px;border:1.5px solid var(--rule);border-radius:12px 9px 12px 10px;background:color-mix(in srgb,var(--c) 18%,var(--sheet))}
+.mine .rank{width:1.3em}
+.sw{width:16px;height:16px;border-radius:5px 3px 5px 4px;background:var(--c);border:1.5px solid var(--ink);flex:none}
+.mine-body{flex:1 1 240px;min-width:0}
+.mine-codes{font-size:.72rem;letter-spacing:.05em;color:var(--ink-3);font-weight:600}
+.mine-name{font-weight:600;line-height:1.3}
+.mine-sub{font-size:.78rem;color:var(--ink-2);margin-top:3px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.mine-sub .warn{font-weight:600}
+.mine-cred{font-family:var(--font-hand);font-weight:700;font-size:1.45rem;line-height:1;white-space:nowrap;min-width:3.2em;text-align:right}
+.mine-actions{display:flex;gap:5px}
+.mine-empty{padding:22px 10px;text-align:center;border:2px dashed var(--rule);border-radius:14px;color:var(--ink-2)}
+.mine-empty .hand{display:block;font-size:1.6rem;font-weight:700;color:var(--ink)}
+.mine-foot{display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px;margin-top:18px;padding-top:18px;border-top:2px dashed var(--rule)}
+.mine-foot .spacer{flex:1}
+.total{font-family:var(--font-hand);font-size:1.75rem;font-weight:700;line-height:1}
+.total small{font-family:var(--font-ui);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;font-weight:500;color:var(--ink-3);display:block}
+
+/* ---------- results ---------- */
+.res-count{font-family:var(--font-hand);font-size:1.5rem;font-weight:700}
+.filters{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 14px;border:1.5px dashed var(--ink-4);border-radius:14px;background:var(--sheet-2)}
+.fgroup{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.flabel{font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;font-weight:600;color:var(--ink-3);margin-right:4px}
+.fac-input{width:min(240px,100%);padding:.42em .8em .42em 2.2em;background-size:.95em;background-position:.75em 50%;border-width:1.5px;font-size:.86rem}
+.sel{padding:.38em 2em .38em .75em;border:1.5px solid var(--ink);border-radius:10px 7px 10px 8px;background:var(--sheet) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%231D2340' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 8l4.5 4.5L14.5 8'/%3E%3C/svg%3E") no-repeat right .55em center/1em;appearance:none;-webkit-appearance:none;font-size:.86rem;cursor:pointer}
+.res-body{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;margin-top:18px;align-items:start}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.stat{font-size:.8rem;padding:.28em .8em;border-radius:99px;background:var(--sky-soft);border:1.5px solid color-mix(in srgb,var(--sky) 45%,transparent);white-space:nowrap}
+.stat b{font-weight:700;font-variant-numeric:tabular-nums}
+.stat.good{background:var(--mint-soft);border-color:color-mix(in srgb,var(--mint) 70%,transparent)}
+.stat.m{background:var(--sun-soft);border-color:color-mix(in srgb,var(--sun) 80%,var(--ink) 10%)}
+.stat.e{background:var(--grape-soft);border-color:color-mix(in srgb,var(--grape) 45%,transparent)}
+.stat.warnish{background:var(--berry-soft);border-color:color-mix(in srgb,var(--berry) 50%,transparent)}
+.legend{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.legend li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;padding:10px 12px;border-radius:12px 9px 12px 10px;background:color-mix(in srgb,var(--c) 26%,var(--sheet));border:1.5px solid color-mix(in srgb,var(--c) 70%,var(--ink) 25%)}
+.legend .sw{margin-top:3px}
+.lg-code{font-size:.72rem;letter-spacing:.05em;font-weight:600;color:var(--ink-3)}
+.lg-name{font-weight:600;font-size:.9rem;line-height:1.3}
+.lg-fac{font-size:.82rem;margin-top:2px}
+.lg-slots{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;margin-top:6px;font-size:.76rem;color:var(--ink-2)}
+.legend li.dropped{background:var(--sheet-2);border-style:dashed;border-color:var(--ink-4)}
+.legend li.dropped .lg-name{text-decoration:line-through;color:var(--ink-3)}
+.res-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-top:18px}
+.pager{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pg{min-width:38px;height:38px;padding:0 .5em;border:1.5px solid var(--ink);border-radius:10px 7px 10px 8px;background:var(--sheet);font-weight:600;font-size:.88rem;cursor:pointer;font-variant-numeric:tabular-nums;display:grid;place-items:center}
+.pg:hover:not(:disabled){background:var(--sun-soft)}
+.pg[aria-current="page"]{background:var(--ink);color:var(--sheet)}
+.pg:disabled{opacity:.3;cursor:default}
+.pg-label{font-family:var(--font-hand);font-size:1.45rem;font-weight:700;margin-right:6px;white-space:nowrap}
+.res-empty{display:grid;gap:10px;justify-items:start;padding:22px 18px;border:2px dashed var(--rule);border-radius:16px;background:var(--sheet-2);margin-top:18px}
+.res-empty .big{font-family:var(--font-hand);font-weight:700;font-size:1.8rem;line-height:1}
+.res-empty ul{margin:0;padding-left:1.2em;color:var(--ink-2);display:grid;gap:4px}
+.trunc{font-size:.8rem;color:var(--ink-3);margin-top:8px}
+
+/* ---------- timetable grid ---------- */
+.tt-scroll{overflow-x:auto;border:2px solid var(--ink);border-radius:14px 10px 14px 12px;background:var(--sheet);scrollbar-width:thin}
+.tt{display:grid;grid-template-columns:56px repeat(68,minmax(11px,1fr));grid-template-rows:26px 24px repeat(10,42px);min-width:820px;font-variant-numeric:tabular-nums}
+.tt-corner{grid-row:1/3;grid-column:1;border-right:1.5px solid var(--rule);border-bottom:1.5px solid var(--ink);display:flex;align-items:flex-end;padding:0 0 4px 8px;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.tt-hour{grid-row:1;font-size:10.5px;font-weight:600;color:var(--ink-2);border-left:1.5px solid var(--ink-4);padding:3px 0 0 4px;white-space:nowrap;z-index:1}
+.tt-ticks{grid-row:1;grid-column:2/-1;align-self:end;height:6px;background-image:linear-gradient(90deg,var(--ink-4) 1px,transparent 1px);background-size:calc(100% / 68) 100%}
+.tt-band{grid-row:2;font-size:9.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;justify-content:center;border-top:1.5px solid var(--rule);border-bottom:1.5px solid var(--ink);background:var(--sheet-2);white-space:nowrap;overflow:hidden}
+.tt-band.lunch{font-family:var(--font-hand);text-transform:none;letter-spacing:0;font-size:16px;font-weight:700;color:var(--berry-ink)}
+.tt-dayband{grid-column:1/-1;border-top:1.5px solid var(--rule-2)}
+.tt-dayband.alt{background:var(--sheet-2)}
+.tt-day{grid-column:1;display:flex;flex-direction:column;justify-content:center;padding-left:10px;border-right:1.5px solid var(--rule);z-index:1;line-height:1}
+.tt-day b{font-family:var(--font-hand);font-weight:700;font-size:1.4rem}
+.tt-day small{font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.tt-lunch{background:repeating-linear-gradient(-45deg,transparent 0 5px,color-mix(in srgb,var(--berry) 16%,transparent) 5px 7px)}
+.tt-extra{z-index:1;margin:4px 2px;display:grid;place-items:center;border:1.5px dashed var(--ink-4);border-radius:8px;font-family:var(--font-hand);font-size:1.05rem;font-weight:700;color:var(--ink-3);white-space:nowrap;overflow:hidden;background:repeating-linear-gradient(-45deg,var(--sheet) 0 6px,var(--rule-2) 6px 8px)}
+.cell{position:relative;z-index:1;margin:3px 1.5px;min-width:0;padding:0 2px;border:1.5px solid var(--rule);border-radius:7px 5px 7px 6px;background:var(--sheet);color:var(--ink-3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font:600 10.5px/1.1 var(--font-ui);text-align:center;overflow:hidden;transition:background .12s,border-color .12s,transform .12s}
+.cell.lab{border-style:dashed;background:transparent}
+.cell .sub{font-weight:500;font-size:9px;opacity:.85;white-space:nowrap}
+button.cell{cursor:pointer;-webkit-appearance:none;appearance:none}
+button.cell:hover{border-color:var(--ink);color:var(--ink)}
+.cell.on{background:var(--c);border:1.5px solid var(--ink);color:var(--ink);border-style:solid}
+.cell.blocked{background:repeating-linear-gradient(-45deg,var(--sheet) 0 4px,var(--rule-2) 4px 7px);color:var(--ink-4);text-decoration:line-through}
+.cell.preview{outline:2.5px dashed var(--ink);outline-offset:-1px;color:var(--ink);background:var(--sun-soft);transform:scale(1.04);z-index:2}
+.swipe{display:none;font-family:var(--font-hand);font-size:1.15rem;color:var(--ink-3);margin-top:6px}
+
+/* ---------- slot view ---------- */
+.slots{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:28px;align-items:start}
+.sv-intro{color:var(--ink-2);max-width:62ch;margin-bottom:16px}
+.sv-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:14px;font-size:.78rem;color:var(--ink-2)}
+.sv-legend span{display:inline-flex;align-items:center;gap:6px}
+.sv-legend i{width:18px;height:12px;border-radius:3px;border:1.5px solid var(--ink);display:inline-block}
+.sv-legend i.dash{border-style:dashed;border-color:var(--ink-3);background:var(--sheet)}
+.sv-legend i.hatch{border-color:var(--ink-4);background:repeating-linear-gradient(-45deg,var(--sheet) 0 3px,var(--rule) 3px 5px)}
+.panel{display:grid;gap:18px}
+.panel .seg{--seg:var(--sky-mid)}
+.sgroup-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.sgroup h4{font-family:var(--font-hand);font-size:1.45rem;line-height:1}
+.sgroup-head span{font-size:.72rem;color:var(--ink-3);font-weight:500}
+.sbtns{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
+.sbtns.labs{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}
+.sbtn{display:grid;justify-items:center;gap:1px;padding:.4em .3em .35em;border:2px solid var(--ink);border-radius:var(--wob-2);background:var(--sheet);font-weight:700;font-size:.86rem;line-height:1.1;cursor:pointer;box-shadow:0 2px 0 var(--ink);transition:transform .12s,box-shadow .12s,background .12s}
+.sbtn small{font-weight:500;font-size:.64rem;color:var(--ink-2);white-space:nowrap}
+.sbtn.m{background:var(--sun-soft)}
+.sbtn.e{background:var(--grape-soft)}
+.sbtn.lab{background:var(--mint-soft)}
+.sbtn:hover{transform:translateY(-1px) rotate(-2deg)}
+.sbtn.on{transform:rotate(-2deg) translateY(1px);box-shadow:0 1px 0 var(--ink)}
+.sbtn.m.on{background:var(--sun)}
+.sbtn.e.on{background:var(--grape-mid)}
+.sbtn.lab.on{background:var(--mint)}
+.sbtn.clash{background:repeating-linear-gradient(-45deg,var(--sheet) 0 4px,var(--rule-2) 4px 7px);border-color:var(--ink-4);color:var(--ink-4);box-shadow:none;text-decoration:line-through;cursor:not-allowed;transform:none}
+.sbtn.clash small{color:var(--ink-4)}
+.picked{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{display:inline-flex;align-items:center;gap:4px;padding:.2em .3em .2em .65em;border:1.5px solid var(--ink);border-radius:99px;font-weight:600;font-size:.8rem;cursor:pointer}
+.pchip.m{background:var(--sun)} .pchip.e{background:var(--grape-mid)} .pchip.lab{background:var(--mint)}
+.pchip .ic svg{width:14px;height:14px;stroke-width:2.6}
+.pchip:hover{filter:brightness(.95)}
+.sv-sum{border-top:2px dashed var(--rule);padding-top:16px;display:grid;gap:12px}
+.sv-sum h4{font-family:var(--font-hand);font-size:1.5rem;line-height:1}
+.sv-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
+.sv-stats div{padding:8px 10px;border-radius:10px;background:var(--sheet-2);border:1.5px solid var(--rule)}
+.sv-stats dt{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.sv-stats dd{margin:0;font-family:var(--font-hand);font-weight:700;font-size:1.55rem;line-height:1.1}
+.slotstr{display:flex;gap:8px;align-items:center}
+.slotstr code{flex:1;min-width:0;overflow-wrap:anywhere;font:600 .84rem/1.4 ui-monospace,"SF Mono",Menlo,Consolas,monospace;padding:.5em .7em;border:1.5px dashed var(--ink-3);border-radius:9px;background:var(--sheet-2);user-select:all}
+.sv-actions{display:flex;flex-wrap:wrap;gap:10px}
+
+/* ---------- toast & footer ---------- */
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:50;max-width:min(92vw,440px);padding:.65em 1.1em;background:var(--sun-soft);border:2px solid var(--ink);border-radius:14px 9px 14px 10px;box-shadow:var(--lift);font-weight:500;font-size:.9rem;transform:translate(-50%,30px) rotate(-1.5deg);opacity:0;pointer-events:none;transition:transform .22s,opacity .22s}
+.toast.show{transform:translate(-50%,0) rotate(-1.5deg);opacity:1}
+.foot{margin-top:46px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;font-size:.8rem;color:var(--ink-3)}
+.foot .hand{font-size:1.25rem;color:var(--ink-2)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1150px){
+  .slots{grid-template-columns:1fr}
+  .res-body{grid-template-columns:1fr}
+  .legend{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+}
+@media (max-width:920px){
+  .planner-top{grid-template-columns:1fr}
+  .swipe{display:block}
+}
+@media (max-width:680px){
+  .hero{grid-template-columns:1fr;padding-block:14px 26px}
+  .cheat{justify-self:center;transform:rotate(1.5deg)}
+  .star{display:none}
+  .tab{font-size:1.35rem}
+  .card-title{font-size:1.85rem}
+  .stamp b{font-size:1.3rem}
+  .brand-sub{display:none}
+  .fac-secs,.clash-msg,.fac-hint{margin-left:0}
+  .mine .grip{display:none}
+  .mine-actions{margin-left:auto}
+  .filters{gap:12px}
+  .res-foot{flex-direction:column;align-items:stretch}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="wrap top">
+  <a class="brand" href="#planner" aria-label="Slotbook home">
+    <svg viewBox="0 0 44 44" aria-hidden="true">
+      <rect class="logo-cover" x="10" y="5" width="28" height="34" rx="4"/>
+      <rect class="logo-hl" x="15" y="12" width="17" height="5" rx="2.5"/>
+      <path class="logo-line" d="M16 23h15M16 29h10M6 11h7M6 18h7M6 25h7M6 32h7"/>
+    </svg>
+    <span><span class="brand-name">Slotbook</span><span class="brand-sub">FFCS timetable planner</span></span>
+  </a>
+  <div class="stamp"><span>Winter semester</span><b>2026–27</b></div>
+</header>
+
+<section class="wrap hero">
+  <div class="hero-copy">
+    <svg class="star" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4c1.6 8.6 3.8 13.2 14 16-10.2 2.8-12.4 7.4-14 16-1.6-8.6-3.8-13.2-14-16 10.2-2.8 12.4-7.4 14-16z"/></svg>
+    <svg class="star s2" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4c1.6 8.6 3.8 13.2 14 16-10.2 2.8-12.4 7.4-14 16-1.6-8.6-3.8-13.2-14-16 10.2-2.8 12.4-7.4 14-16z"/></svg>
+    <h1>Plan your <span class="hl">FFCS</span> before the seats fill up.</h1>
+    <p class="lede">See where every slot lands in the week, pick the faculty you want, and get every clash-free timetable for your courses.</p>
+  </div>
+  <aside class="cheat" aria-label="Slot cheat sheet">
+    <span class="pin" aria-hidden="true"></span>
+    <h3>Slot cheat sheet</h3>
+    <ul>
+      <li><b>A1</b><span>2 classes a week</span></li>
+      <li><b>A1+TA1</b><span>3 classes a week</span></li>
+      <li><b>A1+TA1+TAA1</b><span>4 classes a week</span></li>
+      <li><b>L1+L2</b><span>one 1h 40m lab</span></li>
+    </ul>
+    <p>Morning theory, afternoon lab. Evening theory, morning lab.</p>
+  </aside>
+</section>
+
+<nav class="wrap tabs" role="tablist" aria-label="Tools">
+  <button class="tab tab-planner" type="button" role="tab" id="tab-planner" aria-controls="view-planner" aria-selected="true">Timetable Planner</button>
+  <button class="tab tab-slots" type="button" role="tab" id="tab-slots" aria-controls="view-slots" aria-selected="false">Slot View</button>
+</nav>
+
+<main class="wrap">
+  <!-- ================= PLANNER ================= -->
+  <section id="view-planner" class="planner" role="tabpanel" aria-labelledby="tab-planner">
+    <div class="planner-top">
+      <div class="sheet picker">
+        <span class="tape" style="--tape:var(--sky)"></span>
+        <div class="card-head"><h2 class="card-title"><span class="step">1</span>Pick a course</h2></div>
+        <div class="seg" id="cats" role="group" aria-label="Course category"></div>
+        <input class="field" id="course-search" type="search" placeholder="Search by name, code or faculty" autocomplete="off" aria-label="Search courses">
+        <ul class="clist" id="course-list"></ul>
+      </div>
+      <div class="sheet" id="editor-card">
+        <span class="tape r" style="--tape:var(--sun)"></span>
+        <div class="card-head"><h2 class="card-title"><span class="step">2</span>Choose slots &amp; faculty</h2></div>
+        <div id="editor"></div>
+      </div>
+    </div>
+
+    <div class="sheet" id="mine-card">
+      <span class="tape l" style="--tape:var(--mint)"></span>
+      <div class="card-head">
+        <h2 class="card-title"><span class="step">3</span>Your courses</h2>
+        <span class="note">Clashing courses can't be added, so everything here fits</span>
+      </div>
+      <div id="example-note" class="example-note" hidden>
+        <span class="hand">Example picks</span>
+        <span>These courses are loaded so you can see how it works.</span>
+        <button class="linkbtn" type="button" id="start-fresh">Start fresh</button>
+      </div>
+      <ol class="mine-list" id="mine-list"></ol>
+      <div class="mine-foot">
+        <div class="total" id="total"></div>
+        <span class="spacer"></span>
+        <button class="btn btn-plain" type="button" id="remove-all">Remove all</button>
+        <button class="btn btn-sun" type="button" id="see-results"></button>
+      </div>
+    </div>
+
+    <div class="sheet" id="results-card">
+      <span class="tape" style="--tape:var(--grape)"></span>
+      <div class="card-head">
+        <h2 class="card-title"><span class="step">4</span>Your timetables</h2>
+        <span class="res-count" id="res-count"></span>
+      </div>
+      <div class="filters" id="filters">
+        <div class="fgroup" role="group" aria-label="Theory timing" id="time-chips"></div>
+        <div class="fgroup">
+          <label class="flabel" for="sort">Sort</label>
+          <select class="sel" id="sort">
+            <option value="priority">Your course order</option>
+            <option value="eight">Fewest 8 AM starts</option>
+            <option value="campus">Least time on campus</option>
+          </select>
+        </div>
+      </div>
+      <div id="results"></div>
+    </div>
+  </section>
+
+  <!-- ================= SLOT VIEW ================= -->
+  <section id="view-slots" class="slots" role="tabpanel" aria-labelledby="tab-slots" hidden>
+    <div class="sheet">
+      <span class="tape" style="--tape:var(--sky)"></span>
+      <div class="card-head"><h2 class="card-title">Slot View</h2><span class="note">Each tick is 10 minutes</span></div>
+      <p class="sv-intro">Tap any slot on the grid or in the panel to see where it lands. Slots that would clash with your picks lock themselves.</p>
+      <div class="tt-scroll" id="sv-grid"></div>
+      <p class="swipe">Swipe the grid sideways to see the evening</p>
+      <div class="sv-legend" aria-hidden="true">
+        <span><i style="background:var(--sun)"></i>Morning theory</span>
+        <span><i style="background:var(--grape-mid)"></i>Evening theory</span>
+        <span><i style="background:var(--mint)"></i>Lab</span>
+        <span><i class="dash"></i>Lab slot (1h 40m)</span>
+        <span><i class="hatch"></i>Clashes with a pick</span>
+      </div>
+    </div>
+    <aside class="sheet panel">
+      <span class="tape r" style="--tape:var(--berry)"></span>
+      <div class="seg" id="sv-kind" role="group" aria-label="Slot type">
+        <button type="button" data-kind="th" aria-pressed="true">Theory</button>
+        <button type="button" data-kind="lab" aria-pressed="false">Lab</button>
+      </div>
+      <div id="sv-buttons" class="panel"></div>
+      <div class="sv-sum" id="sv-sum"></div>
+    </aside>
+  </section>
+
+  <footer class="foot">
+    <span class="hand">Made for VIT FFCS, Winter 2026–27</span>
+    <span>Course list: Discipline Core, Discipline Elective and Open Elective. Double-check slots on VTOP before you register.</span>
+  </footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* ======================================================================
+   Slot geometry. Time is counted in 10-minute units from 8:00 AM,
+   so the grid runs 0..68 (8:00 AM to 7:20 PM).
+   Theory: 50 min classes starting on the hour.
+   Labs: two 50 min periods back to back (1h 40m).
+   ====================================================================== */
+const UNITS = 68;
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const DAY_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const TH_START = [0, 6, 12, 18, 24, 36, 42, 48, 54, 60];   // 8,9,10,11,12 | 2,3,4,5,6
+const TH_LEN = 5;
+const LAB_START = [0, 11, 22, 36, 47, 58];                  // 8:00, 9:50, 11:40 | 2:00, 3:50, 5:40
+const LAB_LEN = 10;
+const TH_GRID = [
+  ['A1', 'F1', 'D1', 'TB1', 'TG1', 'A2', 'F2', 'D2', 'TB2', 'TG2'],
+  ['B1', 'G1', 'E1', 'TC1', 'TAA1', 'B2', 'G2', 'E2', 'TC2', 'TAA2'],
+  ['C1', 'A1', 'F1', null, null, 'C2', 'A2', 'F2', 'TD2', 'TBB2'],
+  ['D1', 'B1', 'G1', 'TE1', 'TCC1', 'D2', 'B2', 'G2', 'TE2', 'TCC2'],
+  ['E1', 'C1', 'TA1', 'TF1', 'TD1', 'E2', 'C2', 'TA2', 'TF2', 'TDD2']
+];
+const TH_MORNING = ['A1','B1','C1','D1','E1','F1','G1','TA1','TB1','TC1','TD1','TE1','TF1','TG1','TAA1','TCC1'];
+const TH_EVENING = ['A2','B2','C2','D2','E2','F2','G2','TA2','TB2','TC2','TD2','TE2','TF2','TG2','TAA2','TBB2','TCC2','TDD2'];
+
+const labName = (d, b) => {
+  const n = (b < 3 ? d * 6 + b * 2 : 30 + d * 6 + (b - 3) * 2) + 1;
+  return 'L' + n + '+L' + (n + 1);
+};
+
+const SLOTS = new Map();
+TH_GRID.forEach((row, d) => row.forEach((nm, i) => {
+  if (!nm) return;
+  if (!SLOTS.has(nm)) SLOTS.set(nm, { name: nm, kind: 'th', half: nm.endsWith('1') ? 'm' : 'e', occ: [] });
+  SLOTS.get(nm).occ.push([d, TH_START[i], TH_START[i] + TH_LEN]);
+}));
+for (let d = 0; d < 5; d++) for (let b = 0; b < 6; b++) {
+  const nm = labName(d, b);
+  SLOTS.set(nm, { name: nm, kind: 'lab', half: b < 3 ? 'm' : 'e', occ: [[d, LAB_START[b], LAB_START[b] + LAB_LEN]] });
+}
+const labNum = nm => +nm.slice(1, nm.indexOf('+'));
+const LABS_SORTED = [...SLOTS.values()].filter(s => s.kind === 'lab').sort((a, b) => labNum(a.name) - labNum(b.name));
+const LAB_M = LABS_SORTED.filter(s => s.half === 'm').map(s => s.name);
+const LAB_E = LABS_SORTED.filter(s => s.half === 'e').map(s => s.name);
+const SLOT_ORDER = [...TH_MORNING, ...TH_EVENING, ...LAB_M, ...LAB_E];
+
+const clock = u => { const t = 480 + u * 10, h = Math.floor(t / 60); return { h12: h > 12 ? h - 12 : h, m: t % 60, pm: h >= 12 }; };
+const pad = n => String(n).padStart(2, '0');
+const fmtT = (u, ap = true) => { const c = clock(u); return c.h12 + ':' + pad(c.m) + (ap ? (c.pm ? ' PM' : ' AM') : ''); };
+const fmtShort = u => { const c = clock(u); return c.h12 + (c.m ? ':' + pad(c.m) : '') + (c.pm ? ' PM' : ' AM'); };
+const fmtRange = (s, e) => clock(s).pm === clock(e).pm ? fmtT(s, false) + '–' + fmtT(e) : fmtT(s) + '–' + fmtT(e);
+
+const slotParts = str => { const p = str.split('+').map(x => x.trim()); return p[0][0] === 'L' ? [p[0] + '+' + p[1]] : p; };
+const slotOcc = str => slotParts(str).flatMap(nm => { const s = SLOTS.get(nm); if (!s) { console.warn('Unknown slot', nm); return []; } return s.occ; });
+const whenShort = str => slotOcc(str).map(([d, s]) => DAYS[d] + ' ' + fmtShort(s)).join(' · ');
+const whenLong = str => slotOcc(str).map(([d, s, e]) => DAY_FULL[d] + ' ' + fmtRange(s, e)).join(', ');
+
+/* ======================================================================
+   Course data — Winter Semester 2026-27
+   kind: TH theory (lab may be a separate P code), ETH embedded theory+lab,
+         LO lab only, SS soft skill
+   rows: [slot, venue, faculty]
+   ====================================================================== */
+const CATS = [
+  { id: 'DC', name: 'Discipline Core' },
+  { id: 'DE', name: 'Discipline Elective' },
+  { id: 'OE', name: 'Open Elective' }
+];
+const RAW = [
+  { id: 'BEEE309', cat: 'DC', kind: 'TH', name: 'Microprocessors and Microcontrollers', codes: ['BEEE309L', 'BEEE309P'], labTitle: 'Microprocessors and Microcontrollers Lab',
+    theory: [
+      ['A2+TA2', 'TT204', 'CHILUKURI VENKATA MAHENDRA'],
+      ['A1+TA1', 'TT201', 'BALAMURUGAN M'],
+      ['A2+TA2', 'TT434A', 'RAMA PRABHA D'],
+      ['A1+TA1', 'TT204', 'MADDELA CHINNA OBAIAH'],
+      ['A2+TA2', 'TT201', 'BALAMURUGAN M'],
+      ['A1+TA1', 'TT434A', 'CHILUKURI VENKATA MAHENDRA']],
+    labs: [
+      ['L15+L16', 'TT515', 'RAMA PRABHA D'],
+      ['L33+L34', 'TT515', 'BALAMURUGAN M'],
+      ['L41+L42', 'TT515', 'BALAMURUGAN M'],
+      ['L9+L10', 'TT515', 'BALAMURUGAN M'],
+      ['L49+L50', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L57+L58', 'TT515', 'MADDELA CHINNA OBAIAH'],
+      ['L39+L40', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L19+L20', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L43+L44', 'TT515', 'MADDELA CHINNA OBAIAH'],
+      ['L29+L30', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L23+L24', 'TT515', 'RAMA PRABHA D'],
+      ['L25+L26', 'TT515', 'BALAMURUGAN M']] },
+  { id: 'BEEE308L', cat: 'DC', kind: 'TH', name: 'Communication Systems', codes: ['BEEE308L'],
+    theory: [
+      ['D1+TD1', 'TT434A', 'RAJINI G.K'],
+      ['D2+TD2', 'TT201', 'BALAJI S'],
+      ['D1+TD1', 'TT201', 'BALAJI S'],
+      ['D2+TD2', 'TT434A', 'ABHISHEK G']],
+    labs: [] },
+  { id: 'BEEE307', cat: 'DC', kind: 'TH', name: 'Electric Drives', codes: ['BEEE307L', 'BEEE307P'], labTitle: 'Power Electronics and Drives Lab',
+    theory: [
+      ['B1+TB1', 'TT434A', 'POOMPAVAI T'],
+      ['B2+TB2', 'TT504', 'RAZIA SULTANA W'],
+      ['B1+TB1', 'TT201', 'GOPINATH M']],
+    labs: [
+      ['L15+L16', 'TT044', 'RAZIA SULTANA W'],
+      ['L27+L28', 'TT044', 'RAZIA SULTANA W'],
+      ['L55+L56', 'TT044', 'POOMPAVAI T'],
+      ['L49+L50', 'TT044', 'GOPINATH M'],
+      ['L39+L40', 'TT044', 'POOMPAVAI T'],
+      ['L37+L38', 'TT044', 'GOPINATH M']] },
+  { id: 'BEEE312P', cat: 'DC', kind: 'LO', name: 'AC Machines Lab', codes: ['BEEE312P'],
+    theory: [],
+    labs: [['L31+L32', 'TT035', 'ANBARASAN P']] },
+  { id: 'BEEE303', cat: 'DC', kind: 'TH', name: 'Control Systems', codes: ['BEEE303L', 'BEEE303P'], labTitle: 'Control Systems Lab',
+    theory: [['G1+TG1', 'TT104', 'JANAKI M']],
+    labs: [['L33+L34', 'TT045', 'JANAKI M']] },
+  { id: 'BEEE306', cat: 'DC', kind: 'TH', name: 'Power System Analysis', codes: ['BEEE306L', 'BEEE306P'], labTitle: 'Power System Analysis Lab',
+    theory: [['E2+TE2', '', 'ARUN S.L.']],
+    labs: [['L13+L14', '', 'ARUN S.L.']] },
+  { id: 'BEEE302', cat: 'DC', kind: 'TH', name: 'Digital Signal Processing', codes: ['BEEE302L', 'BEEE302P'], labTitle: 'Digital Signal Processing Lab',
+    theory: [['G2+TG2', '', 'RAJNI G.K.']],
+    labs: [['L11+L12', '', 'RAJNI G.K.']] },
+
+  { id: 'BECE320E', cat: 'DE', kind: 'ETH', name: 'Embedded C Programming', codes: ['BECE320E'],
+    theory: [
+      ['C2', 'TT434A', 'PONNAMBALAM P'],
+      ['C1', 'TT434A', 'MARIMUTHU R'],
+      ['C1', 'TT201', 'GOMATHI K'],
+      ['C2', 'TT201', 'SELVAKUMAR K'],
+      ['C2', 'TT434', 'GOMATHI K'],
+      ['C1', 'TT204', 'JAKEER HUSSAIN'],
+      ['C1', 'TT434', 'GOPINATH M']],
+    labs: [
+      ['L31+L32', 'TT247A', 'GOMATHI K'],
+      ['L27+L28', 'TT247A', 'PONNAMBALAM P'],
+      ['L33+L34', 'TT247A', 'MARIMUTHU R'],
+      ['L43+L44', 'TT247A', 'JAKEER HUSSAIN'],
+      ['L19+L20', 'TT247A', 'GOMATHI K'],
+      ['L11+L12', 'TT247A', 'SELVAKUMAR K'],
+      ['L57+L58', 'TT247A', 'GOPINATH M']] },
+  { id: 'BEEE401E', cat: 'DE', kind: 'ETH', name: 'Power Systems Protection and Switchgear', codes: ['BEEE401E'],
+    theory: [['G2', 'TT434A', 'MAGESHVARAN R']],
+    labs: [['L3+L4', 'TT037', 'MAGESHVARAN R']] },
+  { id: 'BEEE405L', cat: 'DE', kind: 'TH', name: 'Renewable Energy Systems', codes: ['BEEE405L'],
+    theory: [['E2+TE2', 'TT523', 'VIJAYA PRIYA P']], labs: [] },
+  { id: 'BEEE409L', cat: 'DE', kind: 'TH', name: 'Robotics and Control', codes: ['BEEE409L'],
+    theory: [['G1+TG1', 'TT434A', 'RASHMI RANJAN DAS']], labs: [] },
+  { id: 'BEEE410L', cat: 'DE', kind: 'TH', name: 'Machine Learning', codes: ['BEEE410L'],
+    theory: [['G1+TG1', 'TT201', 'MONICA SUBASHINI M']], labs: [] },
+  { id: 'BEEE411L', cat: 'DE', kind: 'TH', name: 'Artificial Intelligence', codes: ['BEEE411L'],
+    theory: [['G1+TG1', 'TT504', 'MAHALAKSHMI P']], labs: [] },
+  { id: 'BEEE422L', cat: 'DE', kind: 'TH', name: 'Deep Learning', codes: ['BEEE422L'],
+    theory: [['G2+TG2', 'TT414', 'RAGHUNATHAN T']], labs: [] },
+
+  { id: 'BSTS302P', cat: 'OE', kind: 'SS', name: 'Advanced Competitive Coding - II', codes: ['BSTS302P'],
+    theory: [
+      ['F1+TF1', 'Random', 'ETHNUS (APT)'],
+      ['F1+TF1', 'Random', 'FACE (APT)'],
+      ['F2+TF2', 'Random', 'ETHNUS (APT)'],
+      ['F2+TF2', 'Random', 'FACE (APT)']],
+    labs: [] }
+];
+
+const COURSES = RAW.map(c => {
+  const mk = ([slot, venue, fac]) => ({
+    slot, fac, venue: venue || 'Venue TBA', occ: slotOcc(slot),
+    half: SLOTS.get(slotParts(slot)[0]).half,
+    key: slot + '|' + fac + '|' + venue
+  });
+  const theory = c.theory.map(mk), labs = c.labs.map(mk);
+  // A theory section pairs with labs of the same faculty, on the opposite half of the day.
+  const sections = theory.length
+    ? theory.map(t => {
+        let ls = labs.filter(l => l.fac === t.fac && l.half !== t.half);
+        if (!ls.length) ls = labs.filter(l => l.fac === t.fac);
+        return { key: t.key, fac: t.fac, theory: t, labs: ls, half: t.half, noLab: labs.length > 0 && !ls.length };
+      })
+    : labs.map(l => ({ key: l.key, fac: l.fac, theory: null, labs: [l], half: l.half, noLab: false }));
+  const classes = theory.length ? theory[0].occ.length : 0;
+  const credits = (c.kind === 'SS' ? classes / 2 : classes) + (labs.length ? 1 : 0);
+  return Object.assign({}, c, { theory, labs, sections, credits, secByKey: Object.fromEntries(sections.map(s => [s.key, s])) });
+});
+const COURSE = Object.fromEntries(COURSES.map(c => [c.id, c]));
+
+const kindLabel = c => c.kind === 'TH' ? (c.labs.length ? 'Theory + Lab' : 'Theory') : { ETH: 'Embedded', LO: 'Lab only', SS: 'Soft skill' }[c.kind];
+const kindCls = c => c.kind === 'TH' ? (c.labs.length ? 'thlab' : 'th') : c.kind.toLowerCase();
+const credTxt = n => (n % 1 ? n.toFixed(1) : String(n)) + (n === 1 ? ' credit' : ' credits');
+const credNum = n => (n % 1 ? n.toFixed(1) : String(n));
+const uniq = a => [...new Set(a)];
+
+/* ======================================================================
+   Helpers
+   ====================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const reduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const scrollToEl = el => el.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+const moveItem = (arr, f, t) => { const [x] = arr.splice(f, 1); arr.splice(t, 0, x); };
+
+const I = {
+  up: '<svg viewBox="0 0 20 20"><path d="M10 15.5V4.5M5.5 9 10 4.5 14.5 9"/></svg>',
+  down: '<svg viewBox="0 0 20 20"><path d="M10 4.5v11M5.5 11 10 15.5l4.5-4.5"/></svg>',
+  left: '<svg viewBox="0 0 20 20"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>',
+  right: '<svg viewBox="0 0 20 20"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>',
+  trash: '<svg viewBox="0 0 20 20"><path d="M3.5 5.5h13M8 5.5V3.5h4v2M5.5 5.5l.9 11h7.2l.9-11M8.5 9v4.5M11.5 9v4.5"/></svg>',
+  edit: '<svg viewBox="0 0 20 20"><path d="M4 16l.9-3.8 8.4-8.4 2.9 2.9-8.4 8.4L4 16zM11.6 5.5l2.9 2.9"/></svg>',
+  grip: '<svg viewBox="0 0 20 20"><circle cx="7.5" cy="5" r="1.4"/><circle cx="12.5" cy="5" r="1.4"/><circle cx="7.5" cy="10" r="1.4"/><circle cx="12.5" cy="10" r="1.4"/><circle cx="7.5" cy="15" r="1.4"/><circle cx="12.5" cy="15" r="1.4"/></svg>',
+  check: '<svg viewBox="0 0 20 20"><path d="M4.5 10.5l3.6 3.5 7.4-8.5"/></svg>',
+  x: '<svg viewBox="0 0 20 20"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/></svg>',
+  copy: '<svg viewBox="0 0 20 20"><rect x="7" y="7" width="9.5" height="9.5" rx="2"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-6A1.5 1.5 0 0 0 4 5v6a1.5 1.5 0 0 0 1.5 1.5H7"/></svg>',
+  down2: '<svg viewBox="0 0 20 20"><path d="M10 3.5v12M5 11l5 5 5-5"/></svg>'
+};
+const ic = (name, cls = '') => '<span class="ic ' + cls + '" aria-hidden="true">' + I[name] + '</span>';
+
+let toastTimer = null;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), Math.max(2800, msg.length * 55));
+}
+function copyText(txt, okMsg) {
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove();
+    toast(ok ? okMsg : 'Copying is blocked here. Select the text and copy it yourself.');
+  };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => toast(okMsg), fallback);
+    else fallback();
+  } catch (e) { fallback(); }
+}
+
+/* ======================================================================
+   State + storage (per-browser convenience only)
+   ====================================================================== */
+const KEY = 'slotbook:v2';
+const OLD_KEY = 'slotbook:v1';
+const EXAMPLE = [
+  ['BEEE309', 'BALAMURUGAN M'], ['BEEE307', 'GOPINATH M'], ['BEEE308L', 'BALAJI S'],
+  ['BECE320E', 'GOMATHI K'], ['BSTS302P', 'FACE (APT)']
+];
+const LIMIT = 2000;
+
+const facultiesOf = c => uniq(c.sections.map(s => s.fac));
+
+// One course = one faculty. `off` skips some of that faculty's sections, `labsOff` skips labs.
+function normEntry(e, i) {
+  const c = e && COURSE[e.id];
+  if (!c) return null;
+  let fac = e.fac;
+  if (!facultiesOf(c).includes(fac)) {
+    // older saves ranked several faculty: keep the top one that was switched on
+    const oldOff = Array.isArray(e.off) ? e.off : [];
+    const firstOn = (Array.isArray(e.order) ? e.order : []).find(k => c.secByKey[k] && !oldOff.includes(k));
+    fac = firstOn ? c.secByKey[firstOn].fac : facultiesOf(c)[0];
+  }
+  const keys = c.sections.filter(s => s.fac === fac).map(s => s.key);
+  const labKeys = c.labs.map(l => l.key);
+  let off = (Array.isArray(e.off) ? e.off : []).filter(k => keys.includes(k));
+  if (off.length >= keys.length) off = [];
+  return {
+    id: e.id,
+    fac,
+    color: Number.isInteger(e.color) ? ((e.color % 8) + 8) % 8 : i % 8,
+    off,
+    labsOff: (Array.isArray(e.labsOff) ? e.labsOff : []).filter(k => labKeys.includes(k))
+  };
+}
+
+const state = {
+  view: 'planner', cat: 'DC', q: '', mine: [], example: false, draft: null,
+  slotSel: [], svKind: 'th', filt: { time: 'any', sort: 'priority' }, page: 0,
+  results: [], vis: [], truncated: false, diag: null, dropped: []
+};
+
+(function restore() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem(OLD_KEY) || 'null'); } catch (e) { saved = null; }
+  if (saved && typeof saved === 'object') {
+    if (saved.view === 'slots' || saved.view === 'planner') state.view = saved.view;
+    if (CATS.some(c => c.id === saved.cat)) state.cat = saved.cat;
+    if (Array.isArray(saved.mine)) {
+      const seen = new Set();
+      const list = saved.mine.map(normEntry).filter(e => e && !seen.has(e.id) && seen.add(e.id));
+      // keep courses in order, dropping any that clash with the ones above them
+      list.forEach(e => {
+        if (feasible(state.mine.concat([e]))) state.mine.push(e);
+        else state.dropped.push(COURSE[e.id].name);
+      });
+    }
+    state.example = !!saved.example && state.mine.length > 0;
+    if (Array.isArray(saved.slotSel)) state.slotSel = saved.slotSel.filter(n => SLOTS.has(n));
+    if (saved.svKind === 'lab') state.svKind = 'lab';
+    if (saved.filt && typeof saved.filt === 'object') {
+      if (['any', 'morning', 'evening', 'mixed'].includes(saved.filt.time)) state.filt.time = saved.filt.time;
+      if (['priority', 'eight', 'campus'].includes(saved.filt.sort)) state.filt.sort = saved.filt.sort;
+    }
+  } else {
+    state.mine = EXAMPLE.map(([id, fac], i) => normEntry({ id, fac, color: i }, i));
+    state.example = true;
+  }
+  // drop slot picks that clash with each other (e.g. from a stale save)
+  const keep = [];
+  state.slotSel.forEach(nm => { if (!keep.includes(nm) && !keep.some(k => occOverlap(SLOTS.get(k).occ, SLOTS.get(nm).occ))) keep.push(nm); });
+  state.slotSel = keep;
+})();
+
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({
+      view: state.view, cat: state.cat, mine: state.mine, example: state.example,
+      slotSel: state.slotSel, svKind: state.svKind, filt: state.filt
+    }));
+  } catch (e) { /* storage unavailable: the page still works for this visit */ }
+}
+
+function occOverlap(A, B) {
+  return A.some(([d, s, e]) => B.some(([d2, s2, e2]) => d === d2 && s < e2 && s2 < e));
+}
+
+/* ======================================================================
+   Timetable generation
+   ====================================================================== */
+function entryOptions(entry) {
+  const c = COURSE[entry.id];
+  const off = new Set(entry.off), labsOff = new Set(entry.labsOff);
+  const out = [];
+  c.sections.forEach(s => {
+    if (s.fac !== entry.fac || off.has(s.key)) return;
+    if (c.labs.length) {
+      s.labs.forEach(l => {
+        if (labsOff.has(l.key)) return;
+        out.push({ entry, course: c, sec: s, lab: l, occ: s.theory ? s.theory.occ.concat(l.occ) : l.occ });
+      });
+    } else {
+      out.push({ entry, course: c, sec: s, lab: null, occ: s.theory.occ });
+    }
+  });
+  return out;
+}
+
+function draftEntry() {
+  const d = state.draft;
+  return { id: d.id, fac: d.fac, off: [...d.off], labsOff: [...d.labsOff] };
+}
+
+function metrics(p) {
+  let credits = 0, th = 0, labs = 0, m = false, e = false;
+  const first = Array(5).fill(99), last = Array(5).fill(-1), facs = [];
+  p.forEach(o => {
+    if (!o) return;
+    credits += o.course.credits;
+    facs.push(o.sec.fac.toLowerCase());
+    if (o.sec.theory) { th += o.sec.theory.occ.length; if (o.sec.theory.half === 'm') m = true; else e = true; }
+    if (o.lab) labs++;
+    o.occ.forEach(([d, s, en]) => { first[d] = Math.min(first[d], s); last[d] = Math.max(last[d], en); });
+  });
+  let campus = 0, eight = 0;
+  const free = [];
+  for (let d = 0; d < 5; d++) {
+    if (last[d] < 0) { free.push(d); continue; }
+    campus += (last[d] - first[d]) * 10;
+    if (first[d] === 0) eight++;
+  }
+  return { credits, th, labs, campus, eight, free, facs, count: p.filter(Boolean).length, mode: m && e ? 'mixed' : m ? 'morning' : e ? 'evening' : 'none' };
+}
+
+function generate() {
+  state.results = []; state.truncated = false; state.diag = null; state.best = 0;
+  const n = state.mine.length;
+  if (!n) return;
+  const opts = state.mine.map(entryOptions);
+  const occ = new Uint8Array(5 * UNITS);
+  const fits = o => o.occ.every(([d, s, e]) => { for (let u = s; u < e; u++) if (occ[d * UNITS + u]) return false; return true; });
+  const mark = (o, v) => o.occ.forEach(([d, s, e]) => { for (let u = s; u < e; u++) occ[d * UNITS + u] = v; });
+  const pick = new Array(n);
+  const out = [];
+  (function dfs(i) {
+    if (out.length >= LIMIT) return;
+    if (i === n) { out.push(pick.slice()); return; }
+    for (const o of opts[i]) {
+      if (!fits(o)) continue;
+      mark(o, 1); pick[i] = o; dfs(i + 1); mark(o, 0);
+      if (out.length >= LIMIT) return;
+    }
+  })(0);
+  state.truncated = out.length >= LIMIT;
+  state.results = out.map((p, i) => ({ p, i, m: metrics(p) }));
+  if (!state.results.length) state.diag = diagnose(opts);
+}
+
+// True when at least one clash-free timetable exists for these courses.
+function feasible(entries) {
+  const opts = entries.map(entryOptions);
+  if (opts.some(o => !o.length)) return false;
+  const order = opts.map((_, i) => i).sort((a, b) => opts[a].length - opts[b].length);
+  const occ = new Uint8Array(5 * UNITS);
+  const fits = o => o.occ.every(([d, s, e]) => { for (let u = s; u < e; u++) if (occ[d * UNITS + u]) return false; return true; });
+  const mark = (o, v) => o.occ.forEach(([d, s, e]) => { for (let u = s; u < e; u++) occ[d * UNITS + u] = v; });
+  return (function dfs(k) {
+    if (k === order.length) return true;
+    for (const o of opts[order[k]]) {
+      if (!fits(o)) continue;
+      mark(o, 1);
+      const ok = dfs(k + 1);
+      mark(o, 0);
+      if (ok) return true;
+    }
+    return false;
+  })(0);
+}
+
+const optSlotNames = o => (o.sec.theory ? slotParts(o.sec.theory.slot) : []).concat(o.lab ? [o.lab.slot] : []);
+const andList = a => a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
+
+// Plain-text reason why `entry` can't join `others`, or null when it fits.
+function clashMessage(entry, others) {
+  const mineOpts = entryOptions(entry);
+  if (!mineOpts.length) return 'Every slot is switched off. Turn at least one back on.';
+  if (feasible(others.concat([entry]))) return null;
+  const lines = [];
+  const partly = [];
+  others.forEach(oe => {
+    const theirs = entryOptions(oe);
+    if (!theirs.length) return;
+    const name = COURSE[oe.id].name;
+    const always = mineOpts.every(a => theirs.every(b => occOverlap(a.occ, b.occ)));
+    if (!always) {
+      if (mineOpts.some(a => theirs.every(b => occOverlap(a.occ, b.occ)))) partly.push(name);
+      return;
+    }
+    const pairs = [];
+    mineOpts.forEach(a => theirs.forEach(b => optSlotNames(a).forEach(x => optSlotNames(b).forEach(y => {
+      if (occOverlap(SLOTS.get(x).occ, SLOTS.get(y).occ) && !pairs.some(p => p[0] === x && p[1] === y)) pairs.push([x, y]);
+    }))));
+    const mineN = uniq(pairs.map(p => p[0])).slice(0, 4), theirN = uniq(pairs.map(p => p[1])).slice(0, 4);
+    if (pairs.every(([x, y]) => x === y)) lines.push(andList(mineN) + (mineN.length > 1 ? ' are' : ' is') + ' already taken by ' + name + '.');
+    else lines.push(andList(mineN) + (mineN.length > 1 ? ' overlap ' : ' overlaps ') + andList(theirN) + ' of ' + name + '.');
+  });
+  if (lines.length) return lines.join(' ');
+  if (partly.length) return 'Every slot option clashes with ' + andList(partly) + ' in some way, so it can\'t fit around them.';
+  return 'No mix of its slots fits around your current courses.';
+}
+
+// Can this course be added at all (with any faculty) next to the current list?
+function canAdd(c) {
+  const others = state.mine.filter(m => m.id !== c.id);
+  return facultiesOf(c).some(f => feasible(others.concat([{ id: c.id, fac: f, off: [], labsOff: [] }])));
+}
+
+function diagnose(opts) {
+  const msgs = [];
+  state.mine.forEach((e, i) => { if (!opts[i].length) msgs.push('<b>' + esc(COURSE[e.id].name) + '</b> has no sections switched on.'); });
+  if (msgs.length) return msgs;
+  for (let i = 0; i < opts.length; i++) for (let j = i + 1; j < opts.length; j++) {
+    const ok = opts[i].some(a => opts[j].some(b => !occOverlap(a.occ, b.occ)));
+    if (!ok) msgs.push('<b>' + esc(COURSE[state.mine[i].id].name) + '</b> and <b>' + esc(COURSE[state.mine[j].id].name) + '</b> clash in every combination you allowed.');
+  }
+  if (!msgs.length) msgs.push('Every pair of courses fits on its own, but there is no way to fit all of them at once.');
+  return msgs;
+}
+
+function applyFilters() {
+  const f = state.filt;
+  let list = state.results.filter(r => f.time === 'any' || r.m.mode === f.time);
+  if (f.sort === 'eight') list = list.slice().sort((a, b) => a.m.eight - b.m.eight || a.m.campus - b.m.campus || a.i - b.i);
+  else if (f.sort === 'campus') list = list.slice().sort((a, b) => a.m.campus - b.m.campus || a.i - b.i);
+  state.vis = list;
+  if (state.page >= list.length) state.page = Math.max(0, list.length - 1);
+}
+
+function regen(resetPage = true) {
+  generate();
+  if (resetPage) state.page = 0;
+  applyFilters();
+  renderResults();
+  renderMineFoot();
+}
+
+/* ======================================================================
+   Timetable grid (shared by Slot View and results)
+   ====================================================================== */
+function buildGrid(opts) {
+  const h = [];
+  h.push('<div class="tt">');
+  h.push('<div class="tt-corner">Day</div>');
+  for (let k = 0; k < 12; k++) {
+    const s = k * 6, span = Math.min(6, UNITS - s), hr = 8 + k;
+    const lbl = hr === 8 ? '8 AM' : hr === 12 ? '12 PM' : hr > 12 ? String(hr - 12) : String(hr);
+    h.push('<div class="tt-hour" style="grid-column:' + (2 + s) + '/span ' + span + '">' + lbl + '</div>');
+  }
+  h.push('<div class="tt-ticks"></div>');
+  h.push('<div class="tt-band" style="grid-column:2/32">Morning theory</div>');
+  h.push('<div class="tt-band lunch" style="grid-column:32/38">Lunch</div>');
+  h.push('<div class="tt-band" style="grid-column:38/-1">Evening theory</div>');
+  for (let d = 0; d < 5; d++) {
+    const r = 3 + d * 2;
+    h.push('<div class="tt-dayband' + (d % 2 ? ' alt' : '') + '" style="grid-row:' + r + '/span 2"></div>');
+    h.push('<div class="tt-day" style="grid-row:' + r + '/span 2"><b>' + DAYS[d] + '</b><small>theory / lab</small></div>');
+    TH_GRID[d].forEach((nm, i) => {
+      if (!nm) return;
+      h.push(cellHTML(opts, { kind: 'th', name: nm, day: d, start: TH_START[i], end: TH_START[i] + TH_LEN, row: r }));
+    });
+    if (d === 2) h.push('<div class="tt-extra" style="grid-row:' + r + ';grid-column:20/31" title="No morning theory on Wednesday after 10:50 AM">Extramural hours</div>');
+    for (let b = 0; b < 6; b++) {
+      h.push(cellHTML(opts, { kind: 'lab', name: labName(d, b), day: d, start: LAB_START[b], end: LAB_START[b] + LAB_LEN, row: r + 1 }));
+    }
+  }
+  h.push('<div class="tt-lunch" style="grid-row:3/-1;grid-column:32/38"></div>');
+  h.push('</div>');
+  return h.join('');
+}
+
+function cellHTML(opts, info) {
+  const c = opts.cell(info) || {};
+  const tag = opts.interactive ? 'button' : 'div';
+  const title = c.title || (info.name + ' · ' + DAY_FULL[info.day] + ' ' + fmtRange(info.start, info.end));
+  return '<' + tag + (opts.interactive ? ' type="button"' : '') +
+    ' class="cell ' + info.kind + ' ' + (c.cls || '') + '" data-slot="' + info.name + '"' +
+    ' style="grid-row:' + info.row + ';grid-column:' + (2 + info.start) + '/span ' + (info.end - info.start) + ';' + (c.style || '') + '"' +
+    ' title="' + esc(title) + '"' + (c.attrs || '') + '>' +
+    '<span class="nm">' + info.name + '</span>' + (c.sub ? '<span class="sub">' + esc(c.sub) + '</span>' : '') +
+    '</' + tag + '>';
+}
+
+/* ======================================================================
+   Planner: step 1 (course list)
+   ====================================================================== */
+function renderCats() {
+  $('#cats').innerHTML = CATS.map(c => {
+    const n = COURSES.filter(x => x.cat === c.id).length;
+    const on = !state.q && state.cat === c.id;
+    return '<button type="button" data-cat="' + c.id + '" aria-pressed="' + on + '">' + c.name + '<span class="n">' + n + '</span></button>';
+  }).join('');
+}
+
+function renderCourseList() {
+  const q = state.q.trim().toLowerCase();
+  const list = q
+    ? COURSES.filter(c => (c.name + ' ' + c.codes.join(' ') + ' ' + c.sections.map(s => s.fac).join(' ') + ' ' + (c.labTitle || '')).toLowerCase().includes(q))
+    : COURSES.filter(c => c.cat === state.cat);
+  if (!list.length) {
+    $('#course-list').innerHTML = '<li class="no-match">No course matches “' + esc(state.q) + '”. Try a code like BEEE309 or a faculty name.</li>';
+    return;
+  }
+  $('#course-list').innerHTML = list.map(c => {
+    const added = state.mine.some(m => m.id === c.id);
+    const active = state.draft && state.draft.id === c.id;
+    const slots = uniq(c.sections.map(s => s.theory ? slotParts(s.theory.slot)[0] : s.labs[0].slot)).join(' / ');
+    const facN = uniq(c.sections.map(s => s.fac)).length;
+    const blocked = !added && !canAdd(c);
+    const right = active ? '<span class="editing">' + ic('edit') + 'editing</span>'
+      : added ? '<span class="added">' + ic('check') + 'ADDED</span>'
+      : blocked ? '<span class="clash-badge" title="Every faculty for this course clashes with your current courses">' + ic('x') + 'SLOT CLASH</span>' : '';
+    return '<li><button type="button" class="crow' + (active ? ' active' : '') + (blocked ? ' blocked' : '') + '" data-id="' + c.id + '" aria-pressed="' + !!active + '">' +
+      '<span class="crow-top"><span>' + c.codes.join(' + ') + (q ? ' · ' + c.cat : '') + '</span>' + right + '</span>' +
+      '<span class="crow-name">' + esc(c.name) + '</span>' +
+      '<span class="crow-meta"><span class="tag ' + kindCls(c) + '">' + kindLabel(c) + '</span><span>' + credTxt(c.credits) + '</span><span>' + slots + '</span><span>' + facN + ' faculty</span></span>' +
+      '</button></li>';
+  }).join('');
+}
+
+/* ======================================================================
+   Planner: step 2 (pick one faculty)
+   ====================================================================== */
+function openEditor(id, scroll) {
+  const c = COURSE[id];
+  const ex = state.mine.find(m => m.id === id);
+  if (ex) {
+    state.draft = { id, fac: ex.fac, off: new Set(ex.off), labsOff: new Set(ex.labsOff), isNew: false };
+  } else {
+    // start on the first faculty that fits next to the current courses
+    const facs = facultiesOf(c);
+    const fac = facs.find(f => feasible(state.mine.concat([{ id, fac: f, off: [], labsOff: [] }]))) || facs[0];
+    state.draft = { id, fac, off: new Set(), labsOff: new Set(), isNew: true };
+  }
+  renderEditor();
+  renderCourseList();
+  if (scroll && window.innerWidth < 920) scrollToEl($('#editor-card'));
+}
+
+function sectionHTML(c, s, sel, multiSec) {
+  const d = state.draft;
+  const soff = sel && d.off.has(s.key);
+  let h = '<div class="fsec' + (soff ? ' off' : '') + '">';
+  const main = s.theory ? s.theory : s.labs[0];
+  const cls = 'slot-chip ' + (s.theory ? s.theory.half : 'lab') + (soff ? ' off' : '');
+  h += sel && multiSec
+    ? '<button type="button" class="' + cls + '" data-sec="' + esc(s.key) + '" aria-pressed="' + !soff + '" title="' + (soff ? 'Skipped. Tap to include ' : 'Tap to leave out ') + main.slot + '">' + main.slot + '</button>'
+    : '<span class="' + cls + '">' + main.slot + '</span>';
+  h += '<span>' + esc(main.venue) + '</span>';
+  if (s.theory) {
+    h += '<span>' + whenShort(s.theory.slot) + '</span>';
+    if (c.labs.length) {
+      h += '<span class="lbl">Lab</span>';
+      if (s.noLab) h += '<span class="warn">No lab listed for this faculty</span>';
+      else h += s.labs.map(l => {
+        const lo = sel && d.labsOff.has(l.key);
+        const inner = l.slot + '<small>' + DAYS[l.occ[0][0]] + ' ' + fmtShort(l.occ[0][1]) + '</small>';
+        const title = esc(l.slot + ' · ' + whenLong(l.slot) + ' · ' + l.venue);
+        return sel && s.labs.length > 1 && !soff
+          ? '<button type="button" class="lab-chip' + (lo ? ' off' : '') + '" data-lab="' + esc(l.key) + '" aria-pressed="' + !lo + '" title="' + title + (lo ? ' (left out)' : '') + '">' + inner + '</button>'
+          : '<span class="lab-chip" title="' + title + '">' + inner + '</span>';
+      }).join('');
+    }
+  } else {
+    h += '<span>' + DAYS[main.occ[0][0]] + ' ' + fmtRange(main.occ[0][1], main.occ[0][2]) + '</span>';
+  }
+  return h + '</div>';
+}
+
+function renderEditor() {
+  const el = $('#editor');
+  const d = state.draft;
+  if (!d) {
+    el.innerHTML = '<div class="empty">' +
+      '<svg viewBox="0 0 96 56" aria-hidden="true"><path d="M90 40c-18 10-44 10-62-6C18 25 14 16 12 8M12 8 6 18M12 8l9 7"/></svg>' +
+      '<span class="big">Pick a course from the list</span>' +
+      '<p>Its faculty and slots show up here. Choose one faculty and every slot they teach gets tried.</p></div>';
+    return;
+  }
+  const c = COURSE[d.id];
+  const others = state.mine.filter(m => m.id !== d.id);
+  const facs = facultiesOf(c);
+  let selMsg = null, fitN = 0;
+  const cards = facs.map((f, fi) => {
+    const sel = d.fac === f;
+    const secs = c.sections.filter(s => s.fac === f);
+    const multiSec = secs.length > 1;
+    const anyToggle = multiSec || secs.some(s => s.theory && s.labs.length > 1);
+    const msg = clashMessage(sel ? draftEntry() : { id: c.id, fac: f, off: [], labsOff: [] }, others);
+    if (sel) selMsg = msg;
+    if (!msg) fitN++;
+    const id = 'fac-' + c.id + '-' + fi;
+    const fit = others.length ? '<span class="fit ' + (msg ? 'bad' : 'ok') + '">' + (msg ? 'Slot clash' : 'Fits') + '</span>' : '';
+    return '<div class="fac' + (sel ? ' sel' : '') + (msg ? ' bad' : '') + '">' +
+      '<label class="fac-top" for="' + id + '"><input type="radio" class="radio" name="fac-' + c.id + '" id="' + id + '" value="' + fi + '"' + (sel ? ' checked' : '') + '>' +
+      '<span class="fac-name">' + esc(f) + '</span>' + fit + '</label>' +
+      '<div class="fac-secs">' + secs.map(s => sectionHTML(c, s, sel, multiSec)).join('') + '</div>' +
+      (msg ? '<p class="clash-msg">' + esc(msg) + '</p>' : '') +
+      (sel && anyToggle ? '<p class="fac-hint">Every slot here is tried. Tap a slot to leave it out.</p>' : '') +
+      '</div>';
+  }).join('');
+
+  const codes = c.codes.join(' + ');
+  const sub = c.labTitle ? 'Lab: ' + esc(c.labTitle) : '';
+  const fix = fitN ? ' Pick a faculty marked Fits instead.' : ' Remove the clashing course first if you want this one.';
+  el.innerHTML =
+    '<div class="ed-head"><div><div class="ed-codes">' + codes + ' · ' + CATS.find(x => x.id === c.cat).name + '</div><h3>' + esc(c.name) + '</h3>' +
+      '<div class="ed-tags"><span class="tag ' + kindCls(c) + '">' + kindLabel(c) + '</span>' + (sub ? '<span>' + sub + '</span>' : '') + '</div></div>' +
+      '<div class="ed-cred">' + credNum(c.credits) + '<small>credits</small></div></div>' +
+    '<p class="note ed-note">' + (facs.length > 1 ? 'Pick one faculty. All of their slots and labs are tried.' : 'Only one faculty teaches this course.') + '</p>' +
+    '<div class="facs" role="radiogroup" aria-label="Faculty">' + cards + '</div>' +
+    (selMsg ? '<div class="clash-box"><span class="hand">Slot clash!</span><span>' + esc(selMsg) + (others.length ? fix : '') + '</span></div>' : '') +
+    '<div class="ed-foot">' +
+      '<button type="button" class="btn btn-sun' + (selMsg ? ' blocked' : '') + '" id="ed-save" aria-disabled="' + !!selMsg + '">' + (d.isNew ? 'Add to my courses' : 'Save changes') + '</button>' +
+      (d.isNew ? '' : '<button type="button" class="btn btn-soft" id="ed-remove">Remove course</button>') +
+      '<button type="button" class="btn btn-plain" id="ed-close">Close</button>' +
+      '<span class="count">' + (others.length ? fitN + ' of ' + facs.length + ' faculty fit' : facs.length + ' faculty') + '</span>' +
+    '</div>';
+}
+
+function nextColor() {
+  const used = new Set(state.mine.map(m => m.color));
+  for (let i = 0; i < 8; i++) if (!used.has(i)) return i;
+  return state.mine.length % 8;
+}
+
+function commitDraft() {
+  const d = state.draft;
+  const c = COURSE[d.id];
+  const entry = draftEntry();
+  const msg = clashMessage(entry, state.mine.filter(m => m.id !== d.id));
+  if (msg) { toast('Can\'t add ' + c.name + '. ' + msg); return; }
+  const wasNew = d.isNew;
+  if (wasNew) {
+    state.mine.push(Object.assign({ color: nextColor() }, entry));
+    d.isNew = false;
+  } else {
+    Object.assign(state.mine.find(m => m.id === d.id), entry);
+  }
+  state.example = false;
+  save();
+  renderAllPlanner();
+  const n = state.results.length;
+  toast((wasNew ? 'Added ' : 'Saved ') + c.name + ' with ' + entry.fac + '. ' + n + (state.truncated ? '+' : '') + (n === 1 ? ' timetable' : ' timetables') + ' ready.');
+}
+
+/* ======================================================================
+   Planner: step 3 (your courses)
+   ====================================================================== */
+function renderMine() {
+  $('#example-note').hidden = !state.example;
+  const ol = $('#mine-list');
+  if (!state.mine.length) {
+    ol.innerHTML = '<li class="mine-empty"><span class="hand">Nothing here yet</span>Pick a course in step 1 and press “Add to my courses”.</li>';
+  } else {
+    ol.innerHTML = state.mine.map((e, i) => {
+      const c = COURSE[e.id];
+      const opts = entryOptions(e);
+      const slotsOn = uniq(opts.map(o => o.sec.theory ? o.sec.theory.slot : o.lab.slot));
+      return '<li class="mine" draggable="true" data-i="' + i + '" style="--c:var(--c' + (e.color + 1) + ')">' +
+        ic('grip', 'grip') +
+        '<span class="rank" aria-hidden="true">' + (i + 1) + '</span>' +
+        '<span class="sw" aria-hidden="true"></span>' +
+        '<div class="mine-body"><div class="mine-codes">' + c.codes.join(' + ') + '</div><div class="mine-name">' + esc(c.name) + '</div>' +
+          '<div class="mine-sub"><span>' + esc(e.fac) + '</span><span>' + slotsOn.join(' / ') + '</span>' +
+            (opts.length > 1 ? '<span class="muted">' + opts.length + ' slot options</span>' : '') + '</div></div>' +
+        '<span class="mine-cred">' + credNum(c.credits) + ' cr</span>' +
+        '<div class="mine-actions">' +
+          '<button type="button" class="icon-btn" data-act="edit" aria-label="Edit ' + esc(c.name) + '">' + ic('edit') + '</button>' +
+          '<button type="button" class="icon-btn" data-act="up" aria-label="Move up"' + (i === 0 ? ' disabled' : '') + '>' + ic('up') + '</button>' +
+          '<button type="button" class="icon-btn" data-act="down" aria-label="Move down"' + (i === state.mine.length - 1 ? ' disabled' : '') + '>' + ic('down') + '</button>' +
+          '<button type="button" class="icon-btn danger" data-act="del" aria-label="Remove ' + esc(c.name) + '">' + ic('trash') + '</button>' +
+        '</div></li>';
+    }).join('');
+  }
+  renderMineFoot();
+}
+
+function renderMineFoot() {
+  const total = state.mine.reduce((a, e) => a + COURSE[e.id].credits, 0);
+  $('#total').innerHTML = credNum(total) + ' credits<small>' + state.mine.length + (state.mine.length === 1 ? ' course' : ' courses') + '</small>';
+  const n = state.results.length;
+  $('#see-results').innerHTML = (n ? 'See ' + n + (state.truncated ? '+' : '') + (n === 1 ? ' timetable' : ' timetables') : 'See timetables') + ic('down2');
+  $('#remove-all').disabled = !state.mine.length;
+}
+
+/* ======================================================================
+   Planner: step 4 (results)
+   ====================================================================== */
+function renderTimeChips() {
+  const base = state.results;
+  const count = k => k === 'any' ? base.length : base.filter(r => r.m.mode === k).length;
+  $('#time-chips').innerHTML = '<span class="flabel">Theory</span>' + [['any', 'Any'], ['morning', 'Morning'], ['evening', 'Evening'], ['mixed', 'Mixed']]
+    .map(([k, t]) => '<button type="button" class="chip" data-time="' + k + '" aria-pressed="' + (state.filt.time === k) + '">' + t + ' <span class="n">' + count(k) + '</span></button>').join('');
+}
+
+function renderResults() {
+  renderTimeChips();
+  const box = $('#results');
+  const total = state.results.length;
+  $('#res-count').textContent = total ? total + (state.truncated ? '+' : '') + (total === 1 ? ' timetable' : ' timetables') : '';
+  $('#filters').hidden = !total;
+
+  if (!state.mine.length) {
+    box.innerHTML = '<div class="res-empty"><span class="big">Your timetables show up here</span><p>Add a few courses above. Every clash-free combination appears here as soon as you add them.</p></div>';
+    return;
+  }
+  if (!total) {
+    box.innerHTML = '<div class="res-empty"><span class="big">No timetable fits yet</span><ul>' + (state.diag || []).map(m => '<li>' + m + '</li>').join('') + '</ul>' +
+      '<p>Edit or remove one of the courses listed above.</p></div>';
+    return;
+  }
+  if (!state.vis.length) {
+    const t = { morning: 'morning', evening: 'evening', mixed: 'mixed' }[state.filt.time];
+    box.innerHTML = '<div class="res-empty"><span class="big">No ' + t + ' timetables</span><p>' + total + (total === 1 ? ' timetable was' : ' timetables were') + ' made, but none has only ' + t + ' theory with your current faculty.</p>' +
+      '<button type="button" class="btn btn-sun" id="reset-filters">Show all timetables</button></div>';
+    return;
+  }
+
+  const r = state.vis[state.page];
+  const map = new Map();
+  r.p.forEach(o => {
+    if (!o) return;
+    const col = 'var(--c' + (o.entry.color + 1) + ')';
+    if (o.sec.theory) slotParts(o.sec.theory.slot).forEach(nm => map.set(nm, { col, code: o.course.codes[0], o }));
+    if (o.lab) map.set(o.lab.slot, { col, code: o.course.codes[1] || o.course.codes[0], o });
+  });
+  const grid = buildGrid({
+    interactive: false,
+    cell: info => {
+      const hit = map.get(info.name);
+      if (!hit) return null;
+      return {
+        cls: 'on', style: '--c:' + hit.col, sub: hit.code,
+        title: info.name + ' · ' + DAY_FULL[info.day] + ' ' + fmtRange(info.start, info.end) + ' · ' + hit.o.course.name + ' · ' + hit.o.sec.fac
+      };
+    }
+  });
+
+  const m = r.m;
+  const hrs = Math.floor(m.campus / 60), mins = m.campus % 60;
+  const modeTxt = { morning: 'Morning theory', evening: 'Evening theory', mixed: 'Mixed theory', none: 'Labs only' }[m.mode];
+  const stats = [
+    '<span class="stat"><b>' + credNum(m.credits) + '</b> credits</span>',
+    '<span class="stat ' + (m.mode === 'morning' ? 'm' : m.mode === 'evening' ? 'e' : '') + '">' + modeTxt + '</span>',
+    '<span class="stat"><b>' + m.th + '</b> classes + <b>' + m.labs + '</b> ' + (m.labs === 1 ? 'lab' : 'labs') + ' a week</span>',
+    '<span class="stat ' + (m.eight ? 'warnish' : 'good') + '">' + (m.eight ? '<b>' + m.eight + '</b> ' + (m.eight === 1 ? 'day starts' : 'days start') + ' at 8 AM' : 'No 8 AM starts') + '</span>',
+    '<span class="stat"><b>' + hrs + 'h' + (mins ? ' ' + mins + 'm' : '') + '</b> on campus a week</span>'
+  ];
+  if (m.free.length) stats.push('<span class="stat good">Free ' + m.free.map(d => DAY_FULL[d]).join(' &amp; ') + '</span>');
+
+  const legend = state.mine.map((e, i) => {
+    const o = r.p[i];
+    const c = COURSE[e.id];
+    if (!o) return '<li class="dropped" style="--c:var(--c' + (e.color + 1) + ')"><span class="sw"></span><div><div class="lg-code">' + c.codes.join(' + ') + '</div><div class="lg-name">' + esc(c.name) + '</div><div class="lg-fac muted">Dropped: it clashes with a higher-priority course</div></div></li>';
+    let slots = '';
+    if (o.sec.theory) slots += '<span class="slot-chip ' + o.sec.theory.half + '">' + o.sec.theory.slot + '</span><span>' + esc(o.sec.theory.venue) + '</span>';
+    if (o.lab) slots += '<span class="slot-chip lab">' + o.lab.slot + '</span><span>' + esc(o.lab.venue) + '</span>';
+    return '<li style="--c:var(--c' + (e.color + 1) + ')"><span class="sw"></span><div><div class="lg-code">' + c.codes.join(' + ') + '</div><div class="lg-name">' + esc(c.name) + '</div>' +
+      '<div class="lg-fac">' + esc(o.sec.fac) + '</div><div class="lg-slots">' + slots + '</div></div></li>';
+  }).join('');
+
+  box.innerHTML =
+    '<div class="res-body"><div style="min-width:0"><div class="stats">' + stats.join('') + '</div>' +
+      '<div class="tt-scroll" aria-label="Timetable ' + (state.page + 1) + ' grid">' + grid + '</div><p class="swipe">Swipe the grid sideways to see the evening</p>' +
+      (state.truncated ? '<p class="trunc">Showing the first ' + LIMIT + ' timetables in priority order. Switch off a few sections to narrow it down.</p>' : '') +
+    '</div><ul class="legend" aria-label="Courses in this timetable">' + legend + '</ul></div>' +
+    '<div class="res-foot"><div class="pager" id="pager">' + pagerHTML(state.vis.length, state.page) + '</div>' +
+      '<button type="button" class="btn btn-sky" id="copy-tt">' + ic('copy') + 'Copy as text</button></div>';
+}
+
+function pagerHTML(total, cur) {
+  const win = 7;
+  const start = Math.max(0, Math.min(cur - 3, total - win));
+  const end = Math.min(total, start + win);
+  let h = '<span class="pg-label">' + (cur + 1) + ' of ' + total + '</span>';
+  h += '<button type="button" class="pg" data-pg="' + (cur - 1) + '" aria-label="Previous timetable"' + (cur === 0 ? ' disabled' : '') + '>' + ic('left') + '</button>';
+  for (let i = start; i < end; i++) h += '<button type="button" class="pg" data-pg="' + i + '"' + (i === cur ? ' aria-current="page"' : '') + '>' + (i + 1) + '</button>';
+  h += '<button type="button" class="pg" data-pg="' + (cur + 1) + '" aria-label="Next timetable"' + (cur >= total - 1 ? ' disabled' : '') + '>' + ic('right') + '</button>';
+  return h;
+}
+
+function timetableText() {
+  const r = state.vis[state.page];
+  if (!r) return '';
+  const lines = ['Slotbook · Winter 2026-27 · Timetable ' + (state.page + 1) + ' of ' + state.vis.length + ' · ' + credNum(r.m.credits) + ' credits', ''];
+  state.mine.forEach((e, i) => {
+    const o = r.p[i], c = COURSE[e.id];
+    if (!o) { lines.push(c.codes.join('/') + '  ' + c.name + '  (dropped)'); return; }
+    const parts = [];
+    if (o.sec.theory) parts.push(o.sec.theory.slot + ' (' + o.sec.theory.venue + ')');
+    if (o.lab) parts.push(o.lab.slot + ' (' + o.lab.venue + ')');
+    lines.push(c.codes.join('/') + '  ' + c.name + '  ·  ' + parts.join(' + ') + '  ·  ' + o.sec.fac);
+  });
+  return lines.join('\n');
+}
+
+function renderAllPlanner() {
+  renderCats();
+  renderCourseList();
+  renderEditor();
+  renderMine();
+  regen();
+}
+
+/* ======================================================================
+   Slot View
+   ====================================================================== */
+function svOwner() {
+  const owner = new Array(5 * UNITS).fill(null);
+  state.slotSel.forEach(nm => SLOTS.get(nm).occ.forEach(([d, s, e]) => { for (let u = s; u < e; u++) owner[d * UNITS + u] = nm; }));
+  return owner;
+}
+function clashWith(owner, nm) {
+  if (state.slotSel.includes(nm)) return null;
+  for (const [d, s, e] of SLOTS.get(nm).occ) for (let u = s; u < e; u++) { const w = owner[d * UNITS + u]; if (w) return w; }
+  return null;
+}
+const selColor = s => s.kind === 'lab' ? 'var(--mint)' : s.half === 'm' ? 'var(--sun)' : 'var(--grape-mid)';
+
+function renderSlotView() {
+  const owner = svOwner();
+  $('#sv-grid').innerHTML = buildGrid({
+    interactive: true,
+    cell: info => {
+      const s = SLOTS.get(info.name);
+      if (state.slotSel.includes(info.name)) return { cls: 'on', style: '--c:' + selColor(s), attrs: ' aria-pressed="true"' };
+      const cl = clashWith(owner, info.name);
+      if (cl) return { cls: 'blocked', title: info.name + ' clashes with ' + cl, attrs: ' aria-pressed="false" aria-disabled="true"' };
+      return { attrs: ' aria-pressed="false"' };
+    }
+  });
+
+  document.querySelectorAll('#sv-kind button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kind === state.svKind)));
+  const groups = state.svKind === 'th'
+    ? [['Morning theory', 'ends in 1 · 8 AM to 12:50 PM', TH_MORNING, ''], ['Evening theory', 'ends in 2 · 2 PM to 6:50 PM', TH_EVENING, '']]
+    : [['Morning labs', 'L1 to L30 · 8 AM to 1:20 PM', LAB_M, ' labs'], ['Afternoon labs', 'L31 to L60 · 2 PM to 7:20 PM', LAB_E, ' labs']];
+  $('#sv-buttons').innerHTML = groups.map(([t, sub, list, cls]) =>
+    '<div class="sgroup"><div class="sgroup-head"><h4>' + t + '</h4><span>' + sub + '</span></div><div class="sbtns' + cls + '">' +
+    list.map(nm => {
+      const s = SLOTS.get(nm);
+      const on = state.slotSel.includes(nm);
+      const cl = !on && clashWith(owner, nm);
+      const small = s.kind === 'lab' ? DAYS[s.occ[0][0]] + ' ' + fmtShort(s.occ[0][1]) : s.occ.map(o => DAYS[o[0]]).join(' ');
+      const title = cl ? nm + ' clashes with ' + cl : nm + ': ' + whenLong(nm);
+      return '<button type="button" class="sbtn ' + (s.kind === 'lab' ? 'lab' : s.half) + (on ? ' on' : '') + (cl ? ' clash' : '') + '" data-slot="' + nm + '" aria-pressed="' + on + '"' + (cl ? ' aria-disabled="true"' : '') + ' title="' + esc(title) + '"><span>' + nm + '</span><small>' + small + '</small></button>';
+    }).join('') + '</div></div>').join('');
+
+  const sel = state.slotSel.slice().sort((a, b) => SLOT_ORDER.indexOf(a) - SLOT_ORDER.indexOf(b));
+  const thClasses = sel.filter(n => SLOTS.get(n).kind === 'th').reduce((a, n) => a + SLOTS.get(n).occ.length, 0);
+  const labs = sel.filter(n => SLOTS.get(n).kind === 'lab').length;
+  $('#sv-sum').innerHTML =
+    '<h4>Your picks</h4>' +
+    (sel.length
+      ? '<div class="picked">' + sel.map(n => { const s = SLOTS.get(n); return '<button type="button" class="pchip ' + (s.kind === 'lab' ? 'lab' : s.half) + '" data-unpick="' + n + '" aria-label="Remove ' + n + '">' + n + ic('x') + '</button>'; }).join('') + '</div>'
+      : '<p class="muted">Nothing picked yet. Tap a slot on the grid or above.</p>') +
+    '<dl class="sv-stats"><div><dt>Theory classes</dt><dd>' + thClasses + ' a week</dd></div><div><dt>Labs</dt><dd>' + labs + ' × 1h 40m</dd></div></dl>' +
+    (sel.length ? '<div class="slotstr"><code id="slot-string">' + sel.join('+') + '</code><button type="button" class="icon-btn" id="copy-slots" aria-label="Copy slot list">' + ic('copy') + '</button></div>' : '') +
+    '<div class="sv-actions"><button type="button" class="btn btn-plain" id="sv-clear"' + (sel.length ? '' : ' disabled') + '>Clear picks</button></div>';
+}
+
+function toggleSlot(nm) {
+  const i = state.slotSel.indexOf(nm);
+  if (i >= 0) state.slotSel.splice(i, 1);
+  else {
+    const cl = clashWith(svOwner(), nm);
+    if (cl) { toast(nm + ' clashes with ' + cl + '. Remove ' + cl + ' first.'); return; }
+    state.slotSel.push(nm);
+  }
+  save();
+  renderSlotView();
+}
+
+function setPreview(nm) {
+  document.querySelectorAll('#sv-grid .cell.preview').forEach(c => c.classList.remove('preview'));
+  if (nm) document.querySelectorAll('#sv-grid .cell[data-slot="' + nm + '"]').forEach(c => c.classList.add('preview'));
+}
+
+/* ======================================================================
+   Views + events
+   ====================================================================== */
+function setView(v, fromHash) {
+  state.view = v;
+  $('#view-planner').hidden = v !== 'planner';
+  $('#view-slots').hidden = v !== 'slots';
+  $('#tab-planner').setAttribute('aria-selected', String(v === 'planner'));
+  $('#tab-slots').setAttribute('aria-selected', String(v === 'slots'));
+  if (!fromHash) {
+    const h = v === 'slots' ? 'slot-view' : 'planner';
+    if (location.hash.slice(1) !== h) location.hash = h;
+  }
+  save();
+}
+$('#tab-planner').addEventListener('click', () => setView('planner'));
+$('#tab-slots').addEventListener('click', () => setView('slots'));
+window.addEventListener('hashchange', () => {
+  const h = location.hash.slice(1);
+  if (h === 'slot-view') setView('slots', true);
+  else if (h === 'planner') setView('planner', true);
+});
+
+function dnd(container, itemSel, onMove) {
+  let from = null;
+  container.addEventListener('dragstart', e => {
+    const it = e.target.closest && e.target.closest(itemSel);
+    if (!it) return;
+    from = +it.dataset.i;
+    it.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', String(from)); } catch (err) { /* some browsers refuse */ }
+  });
+  container.addEventListener('dragend', () => {
+    from = null;
+    container.querySelectorAll('.dragging, .drop').forEach(x => x.classList.remove('dragging', 'drop'));
+  });
+  container.addEventListener('dragover', e => {
+    if (from === null) return;
+    const it = e.target.closest(itemSel);
+    if (!it) return;
+    e.preventDefault();
+    container.querySelectorAll('.drop').forEach(x => { if (x !== it) x.classList.remove('drop'); });
+    it.classList.add('drop');
+  });
+  container.addEventListener('drop', e => {
+    const it = e.target.closest(itemSel);
+    if (from === null || !it) return;
+    e.preventDefault();
+    const f = from, t = +it.dataset.i;
+    from = null;
+    if (f !== t) onMove(f, t);
+  });
+}
+
+// step 1
+$('#cats').addEventListener('click', e => {
+  const b = e.target.closest('[data-cat]');
+  if (!b) return;
+  state.cat = b.dataset.cat;
+  state.q = '';
+  $('#course-search').value = '';
+  save();
+  renderCats();
+  renderCourseList();
+});
+$('#course-search').addEventListener('input', e => { state.q = e.target.value; renderCats(); renderCourseList(); });
+$('#course-list').addEventListener('click', e => {
+  const b = e.target.closest('[data-id]');
+  if (b) openEditor(b.dataset.id, true);
+});
+
+// step 2
+$('#editor').addEventListener('change', e => {
+  if (!e.target.classList.contains('radio')) return;
+  const d = state.draft;
+  const f = facultiesOf(COURSE[d.id])[+e.target.value];
+  if (!f || f === d.fac) return;
+  d.fac = f;
+  d.off = new Set();
+  d.labsOff = new Set();
+  renderEditor();
+  const again = document.getElementById(e.target.id);
+  if (again) again.focus();
+});
+$('#editor').addEventListener('click', e => {
+  const d = state.draft;
+  if (!d) return;
+  const t = e.target;
+  const c = COURSE[d.id];
+  const sec = t.closest('[data-sec]');
+  if (sec) {
+    const k = sec.dataset.sec;
+    if (d.off.has(k)) d.off.delete(k);
+    else if (c.sections.filter(s => s.fac === d.fac && !d.off.has(s.key)).length > 1) d.off.add(k);
+    else { toast('Keep at least one slot for this faculty.'); return; }
+    renderEditor();
+    const again = $('#editor [data-sec="' + CSS.escape(k) + '"]');
+    if (again) again.focus();
+    return;
+  }
+  const lab = t.closest('[data-lab]');
+  if (lab) {
+    const k = lab.dataset.lab;
+    const s = c.sections.find(x => x.fac === d.fac && x.labs.some(l => l.key === k));
+    if (d.labsOff.has(k)) d.labsOff.delete(k);
+    else if (s && s.labs.filter(l => !d.labsOff.has(l.key)).length > 1) d.labsOff.add(k);
+    else { toast('Keep at least one lab for this slot.'); return; }
+    renderEditor();
+    const again = $('#editor [data-lab="' + CSS.escape(k) + '"]');
+    if (again) again.focus();
+    return;
+  }
+  if (t.closest('#ed-save')) { commitDraft(); return; }
+  if (t.closest('#ed-remove')) { removeCourse(d.id); return; }
+  if (t.closest('#ed-close')) { state.draft = null; renderEditor(); renderCourseList(); }
+});
+
+// step 3
+function removeCourse(id) {
+  const c = COURSE[id];
+  state.mine = state.mine.filter(m => m.id !== id);
+  if (state.draft && state.draft.id === id) state.draft = Object.assign(state.draft, { isNew: true });
+  state.example = false;
+  save();
+  renderAllPlanner();
+  toast('Removed ' + c.name + '.');
+}
+$('#mine-list').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const i = +b.closest('.mine').dataset.i;
+  const act = b.dataset.act;
+  if (act === 'edit') { openEditor(state.mine[i].id, false); scrollToEl($('#editor-card')); return; }
+  if (act === 'del') { removeCourse(state.mine[i].id); return; }
+  const j = i + (act === 'up' ? -1 : 1);
+  if (j < 0 || j >= state.mine.length) return;
+  moveItem(state.mine, i, j);
+  state.example = false;
+  save();
+  renderMine();
+  regen();
+  const btn = $('#mine-list').children[j].querySelector('[data-act="' + act + '"]');
+  if (btn && !btn.disabled) btn.focus();
+});
+dnd($('#mine-list'), '.mine', (f, t) => { moveItem(state.mine, f, t); state.example = false; save(); renderMine(); regen(); });
+$('#see-results').addEventListener('click', () => scrollToEl($('#results-card')));
+let armTimer = null;
+$('#remove-all').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if (!b.classList.contains('armed')) {
+    b.classList.add('armed');
+    b.textContent = 'Tap again to remove all';
+    clearTimeout(armTimer);
+    armTimer = setTimeout(() => { b.classList.remove('armed'); b.textContent = 'Remove all'; }, 3000);
+    return;
+  }
+  clearTimeout(armTimer);
+  b.classList.remove('armed');
+  b.textContent = 'Remove all';
+  state.mine = [];
+  state.example = false;
+  if (state.draft) state.draft.isNew = true;
+  save();
+  renderAllPlanner();
+  toast('Cleared your course list.');
+});
+$('#start-fresh').addEventListener('click', () => {
+  state.mine = [];
+  state.example = false;
+  state.draft = null;
+  save();
+  renderAllPlanner();
+  toast('Fresh page. Pick your first course in step 1.');
+});
+
+// step 4
+$('#filters').addEventListener('click', e => {
+  const b = e.target.closest('[data-time]');
+  if (!b) return;
+  state.filt.time = b.dataset.time;
+  state.page = 0;
+  save();
+  applyFilters();
+  renderResults();
+});
+$('#sort').addEventListener('change', e => { state.filt.sort = e.target.value; state.page = 0; save(); applyFilters(); renderResults(); });
+$('#results').addEventListener('click', e => {
+  const pg = e.target.closest('[data-pg]');
+  if (pg && !pg.disabled) {
+    state.page = Math.max(0, Math.min(state.vis.length - 1, +pg.dataset.pg));
+    renderResults();
+    const cur = $('#pager [aria-current="page"]');
+    if (cur) cur.focus();
+    return;
+  }
+  if (e.target.closest('#copy-tt')) { copyText(timetableText(), 'Timetable copied. Paste it anywhere.'); return; }
+  if (e.target.closest('#reset-filters')) {
+    state.filt.time = 'any';
+    save(); applyFilters(); renderResults();
+  }
+});
+document.addEventListener('keydown', e => {
+  if (state.view !== 'planner' || !state.vis.length) return;
+  if (!document.activeElement || !document.activeElement.closest('#pager')) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    state.page = Math.max(0, Math.min(state.vis.length - 1, state.page + (e.key === 'ArrowRight' ? 1 : -1)));
+    renderResults();
+    const cur = $('#pager [aria-current="page"]');
+    if (cur) cur.focus();
+  }
+});
+
+// slot view
+$('#sv-kind').addEventListener('click', e => {
+  const b = e.target.closest('[data-kind]');
+  if (!b) return;
+  state.svKind = b.dataset.kind;
+  save();
+  renderSlotView();
+});
+$('#view-slots').addEventListener('click', e => {
+  const un = e.target.closest('[data-unpick]');
+  if (un) { toggleSlot(un.dataset.unpick); return; }
+  const s = e.target.closest('.sbtn, button.cell');
+  if (s) {
+    const nm = s.dataset.slot;
+    toggleSlot(nm);
+    const again = document.querySelector((s.classList.contains('sbtn') ? '.sbtn' : '#sv-grid .cell') + '[data-slot="' + nm + '"]');
+    if (again) again.focus();
+    return;
+  }
+  if (e.target.closest('#sv-clear')) { state.slotSel = []; save(); renderSlotView(); toast('Cleared your slot picks.'); return; }
+  if (e.target.closest('#copy-slots')) copyText(state.slotSel.slice().sort((a, b) => SLOT_ORDER.indexOf(a) - SLOT_ORDER.indexOf(b)).join('+'), 'Slot list copied.');
+});
+['mouseover', 'focusin'].forEach(ev => $('#view-slots').addEventListener(ev, e => {
+  const s = e.target.closest && e.target.closest('.sbtn, button.cell');
+  setPreview(s ? s.dataset.slot : null);
+}));
+$('#view-slots').addEventListener('mouseleave', () => setPreview(null));
+
+/* ======================================================================
+   Boot
+   ====================================================================== */
+$('#sort').value = state.filt.sort;
+const h0 = location.hash.slice(1);
+if (h0 === 'slot-view') state.view = 'slots';
+else if (h0 === 'planner') state.view = 'planner';
+setView(state.view, true);
+const firstInCat = COURSES.find(c => c.cat === state.cat);
+if (firstInCat) openEditor(firstInCat.id, false);
+renderAllPlanner();
+renderSlotView();
+if (state.dropped.length) { save(); toast('Removed ' + andList(state.dropped) + ' because ' + (state.dropped.length > 1 ? 'their slots clash' : 'its slots clash') + ' with your other courses.'); }
+})();
+</script>
+</body>
+</html>

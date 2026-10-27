@@ -19,6 +19,8 @@ An FFCS timetable planner for VIT, Winter Semester 2026–27.
 
 A new visitor starts with an empty planner. Everything you do is saved in your browser: your courses, the course you have open, your Slot View picks, filters and the timetable you were looking at. Reloading or coming back later picks up where you left off. Saves stay on that browser and device only.
 
+Visits are counted with [GoatCounter](https://www.goatcounter.com), which uses no cookies and collects no personal data.
+
 ## Slot rules used
 
 | Pattern | Classes a week |

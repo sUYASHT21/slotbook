@@ -230,8 +230,6 @@ button.lab-chip:hover{background:var(--mint)}
 .ed-foot .count{font-size:.8rem;color:var(--ink-3);margin-left:auto}
 .btn.blocked{background:var(--rule-2);color:var(--ink-3);border-color:var(--ink-3);box-shadow:0 3px 0 var(--ink-3)}
 
-.example-note{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 14px;margin-bottom:14px;border:2px dashed var(--tang);border-radius:12px;background:var(--tang-soft);font-size:.88rem}
-.example-note .hand{font-size:1.35rem;font-weight:700;line-height:1}
 .mine-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .mine{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:11px 12px;border:1.5px solid var(--rule);border-radius:12px 9px 12px 10px;background:color-mix(in srgb,var(--c) 18%,var(--sheet))}
 .mine .rank{width:1.3em}
@@ -449,11 +447,6 @@ button.cell:hover{border-color:var(--ink);color:var(--ink)}
       <div class="card-head">
         <h2 class="card-title"><span class="step">3</span>Your courses</h2>
         <span class="note">Clashing courses can't be added, so everything here fits</span>
-      </div>
-      <div id="example-note" class="example-note" hidden>
-        <span class="hand">Example picks</span>
-        <span>These courses are loaded so you can see how it works.</span>
-        <button class="linkbtn" type="button" id="start-fresh">Start fresh</button>
       </div>
       <ol class="mine-list" id="mine-list"></ol>
       <div class="mine-foot">
@@ -764,10 +757,6 @@ function copyText(txt, okMsg) {
    ====================================================================== */
 const KEY = 'slotbook:v2';
 const OLD_KEY = 'slotbook:v1';
-const EXAMPLE = [
-  ['BEEE309', 'BALAMURUGAN M'], ['BEEE307', 'GOPINATH M'], ['BEEE308L', 'BALAJI S'],
-  ['BECE320E', 'GOMATHI K'], ['BSTS302P', 'FACE (APT)']
-];
 const LIMIT = 2000;
 
 const facultiesOf = c => uniq(c.sections.map(s => s.fac));
@@ -797,7 +786,7 @@ function normEntry(e, i) {
 }
 
 const state = {
-  view: 'planner', cat: 'DC', q: '', mine: [], example: false, draft: null,
+  view: 'planner', cat: 'DC', q: '', mine: [], draft: null, restorePage: 0,
   slotSel: [], svKind: 'th', filt: { time: 'any', sort: 'priority' }, page: 0,
   results: [], vis: [], truncated: false, diag: null, dropped: []
 };
@@ -808,7 +797,8 @@ const state = {
   if (saved && typeof saved === 'object') {
     if (saved.view === 'slots' || saved.view === 'planner') state.view = saved.view;
     if (CATS.some(c => c.id === saved.cat)) state.cat = saved.cat;
-    if (Array.isArray(saved.mine)) {
+    // earlier versions preloaded example courses; a list nobody touched is not the visitor's own
+    if (Array.isArray(saved.mine) && !saved.example) {
       const seen = new Set();
       const list = saved.mine.map(normEntry).filter(e => e && !seen.has(e.id) && seen.add(e.id));
       // keep courses in order, dropping any that clash with the ones above them
@@ -817,16 +807,25 @@ const state = {
         else state.dropped.push(COURSE[e.id].name);
       });
     }
-    state.example = !!saved.example && state.mine.length > 0;
+    if (saved.draft && typeof saved.draft === 'object' && COURSE[saved.draft.id]) {
+      const c = COURSE[saved.draft.id];
+      const fac = facultiesOf(c).includes(saved.draft.fac) ? saved.draft.fac : facultiesOf(c)[0];
+      const keys = c.sections.filter(x => x.fac === fac).map(x => x.key);
+      const off = (Array.isArray(saved.draft.off) ? saved.draft.off : []).filter(k => keys.includes(k));
+      state.draft = {
+        id: c.id, fac,
+        off: new Set(off.length < keys.length ? off : []),
+        labsOff: new Set((Array.isArray(saved.draft.labsOff) ? saved.draft.labsOff : []).filter(k => c.labs.some(l => l.key === k))),
+        isNew: !state.mine.some(m => m.id === c.id)
+      };
+    }
+    if (Number.isInteger(saved.page) && saved.page > 0) state.restorePage = saved.page;
     if (Array.isArray(saved.slotSel)) state.slotSel = saved.slotSel.filter(n => SLOTS.has(n));
     if (saved.svKind === 'lab') state.svKind = 'lab';
     if (saved.filt && typeof saved.filt === 'object') {
       if (['any', 'morning', 'evening', 'mixed'].includes(saved.filt.time)) state.filt.time = saved.filt.time;
       if (['priority', 'eight', 'campus'].includes(saved.filt.sort)) state.filt.sort = saved.filt.sort;
     }
-  } else {
-    state.mine = EXAMPLE.map(([id, fac], i) => normEntry({ id, fac, color: i }, i));
-    state.example = true;
   }
   // drop slot picks that clash with each other (e.g. from a stale save)
   const keep = [];
@@ -837,7 +836,8 @@ const state = {
 function save() {
   try {
     localStorage.setItem(KEY, JSON.stringify({
-      view: state.view, cat: state.cat, mine: state.mine, example: state.example,
+      view: state.view, cat: state.cat, mine: state.mine, page: state.page,
+      draft: state.draft && { id: state.draft.id, fac: state.draft.fac, off: [...state.draft.off], labsOff: [...state.draft.labsOff] },
       slotSel: state.slotSel, svKind: state.svKind, filt: state.filt
     }));
   } catch (e) { /* storage unavailable: the page still works for this visit */ }
@@ -1004,6 +1004,7 @@ function regen(resetPage = true) {
   applyFilters();
   renderResults();
   renderMineFoot();
+  save();
 }
 
 /* ======================================================================
@@ -1187,6 +1188,7 @@ function renderEditor() {
       '<button type="button" class="btn btn-plain" id="ed-close">Close</button>' +
       '<span class="count">' + (others.length ? fitN + ' of ' + facs.length + ' faculty fit' : facs.length + ' faculty') + '</span>' +
     '</div>';
+  save();
 }
 
 function nextColor() {
@@ -1208,7 +1210,6 @@ function commitDraft() {
   } else {
     Object.assign(state.mine.find(m => m.id === d.id), entry);
   }
-  state.example = false;
   save();
   renderAllPlanner();
   const n = state.results.length;
@@ -1219,7 +1220,6 @@ function commitDraft() {
    Planner: step 3 (your courses)
    ====================================================================== */
 function renderMine() {
-  $('#example-note').hidden = !state.example;
   const ol = $('#mine-list');
   if (!state.mine.length) {
     ol.innerHTML = '<li class="mine-empty"><span class="hand">Nothing here yet</span>Pick a course in step 1 and press “Add to my courses”.</li>';
@@ -1562,7 +1562,7 @@ $('#editor').addEventListener('click', e => {
   }
   if (t.closest('#ed-save')) { commitDraft(); return; }
   if (t.closest('#ed-remove')) { removeCourse(d.id); return; }
-  if (t.closest('#ed-close')) { state.draft = null; renderEditor(); renderCourseList(); }
+  if (t.closest('#ed-close')) { state.draft = null; save(); renderEditor(); renderCourseList(); }
 });
 
 // step 3
@@ -1570,7 +1570,6 @@ function removeCourse(id) {
   const c = COURSE[id];
   state.mine = state.mine.filter(m => m.id !== id);
   if (state.draft && state.draft.id === id) state.draft = Object.assign(state.draft, { isNew: true });
-  state.example = false;
   save();
   renderAllPlanner();
   toast('Removed ' + c.name + '.');
@@ -1585,14 +1584,13 @@ $('#mine-list').addEventListener('click', e => {
   const j = i + (act === 'up' ? -1 : 1);
   if (j < 0 || j >= state.mine.length) return;
   moveItem(state.mine, i, j);
-  state.example = false;
   save();
   renderMine();
   regen();
   const btn = $('#mine-list').children[j].querySelector('[data-act="' + act + '"]');
   if (btn && !btn.disabled) btn.focus();
 });
-dnd($('#mine-list'), '.mine', (f, t) => { moveItem(state.mine, f, t); state.example = false; save(); renderMine(); regen(); });
+dnd($('#mine-list'), '.mine', (f, t) => { moveItem(state.mine, f, t); save(); renderMine(); regen(); });
 $('#see-results').addEventListener('click', () => scrollToEl($('#results-card')));
 let armTimer = null;
 $('#remove-all').addEventListener('click', e => {
@@ -1608,19 +1606,10 @@ $('#remove-all').addEventListener('click', e => {
   b.classList.remove('armed');
   b.textContent = 'Remove all';
   state.mine = [];
-  state.example = false;
   if (state.draft) state.draft.isNew = true;
   save();
   renderAllPlanner();
   toast('Cleared your course list.');
-});
-$('#start-fresh').addEventListener('click', () => {
-  state.mine = [];
-  state.example = false;
-  state.draft = null;
-  save();
-  renderAllPlanner();
-  toast('Fresh page. Pick your first course in step 1.');
 });
 
 // step 4
@@ -1638,6 +1627,7 @@ $('#results').addEventListener('click', e => {
   const pg = e.target.closest('[data-pg]');
   if (pg && !pg.disabled) {
     state.page = Math.max(0, Math.min(state.vis.length - 1, +pg.dataset.pg));
+    save();
     renderResults();
     const cur = $('#pager [aria-current="page"]');
     if (cur) cur.focus();
@@ -1655,6 +1645,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
     e.preventDefault();
     state.page = Math.max(0, Math.min(state.vis.length - 1, state.page + (e.key === 'ArrowRight' ? 1 : -1)));
+    save();
     renderResults();
     const cur = $('#pager [aria-current="page"]');
     if (cur) cur.focus();
@@ -1697,9 +1688,12 @@ const h0 = location.hash.slice(1);
 if (h0 === 'slot-view') state.view = 'slots';
 else if (h0 === 'planner') state.view = 'planner';
 setView(state.view, true);
-const firstInCat = COURSES.find(c => c.cat === state.cat);
-if (firstInCat) openEditor(firstInCat.id, false);
 renderAllPlanner();
+if (state.restorePage && state.vis.length) {
+  state.page = Math.min(state.restorePage, state.vis.length - 1);
+  renderResults();
+  save();
+}
 renderSlotView();
 if (state.dropped.length) { save(); toast('Removed ' + andList(state.dropped) + ' because ' + (state.dropped.length > 1 ? 'their slots clash' : 'its slots clash') + ' with your other courses.'); }
 })();

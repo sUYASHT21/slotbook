@@ -17,7 +17,7 @@ An FFCS timetable planner for VIT, Winter Semester 2026–27.
 3. Courses that clash with ones you already added can't be added. The page names the clashing slots and the course that took them.
 4. Browse every clash-free timetable. Filter by morning, evening or mixed theory, and sort by your course order, fewest 8 AM starts, or least time on campus.
 
-Your course list and slot picks are saved in your own browser.
+A new visitor starts with an empty planner. Everything you do is saved in your browser: your courses, the course you have open, your Slot View picks, filters and the timetable you were looking at. Reloading or coming back later picks up where you left off. Saves stay on that browser and device only.
 
 ## Slot rules used
 

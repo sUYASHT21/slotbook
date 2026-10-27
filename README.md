@@ -13,9 +13,9 @@ An FFCS timetable planner for VIT, Winter Semester 2026–27.
 
 **Timetable Planner**
 1. Pick a course from Discipline Core, Discipline Elective or Open Elective.
-2. Choose **one faculty**. All of that faculty's theory slots and matching labs are tried.
+2. Choose **one faculty and one theory slot**. If a faculty teaches both C1 and C2, they show up as two separate options, and you pick one. Every lab that goes with that slot is tried, and you can leave out individual labs.
 3. Courses that clash with ones you already added can't be added. The page names the clashing slots and the course that took them.
-4. Browse every clash-free timetable. Filter by morning, evening or mixed theory, and sort by your course order, fewest 8 AM starts, or least time on campus.
+4. Browse every clash-free timetable, one per lab combination. Sort by your course order, fewest 8 AM starts, or least time on campus.
 
 A new visitor starts with an empty planner. Everything you do is saved in your browser: your courses, the course you have open, your Slot View picks, filters and the timetable you were looking at. Reloading or coming back later picks up where you left off. Saves stay on that browser and device only.
 

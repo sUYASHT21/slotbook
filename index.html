@@ -195,9 +195,18 @@ button,input,select{font:inherit;color:inherit}
 .fac{border:1.5px solid var(--rule);border-radius:12px 9px 12px 10px;background:var(--sheet);padding:12px 14px;transition:border-color .15s,background .15s}
 .fac:hover{border-color:var(--ink-3)}
 .fac.sel{border:2px solid var(--ink);background:var(--sun-soft);padding:11.5px 13.5px}
-.fac.bad{background:var(--sheet-2)}
-.fac.sel.bad{background:var(--berry-soft)}
-.fac-top{display:flex;align-items:center;gap:10px;cursor:pointer}
+.fac-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.fac-count{font-size:.72rem;font-weight:600;letter-spacing:.04em;color:var(--ink-3);white-space:nowrap}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opt{border:1.5px solid transparent;border-radius:10px 7px 10px 8px;padding:7px 9px}
+.opt:hover{background:color-mix(in srgb,var(--sun-soft) 50%,transparent)}
+.opt.sel{background:var(--sheet);border-color:var(--ink)}
+.opt.sel.bad{background:var(--berry-soft)}
+.opt.bad:not(.sel) .opt-line{opacity:.7}
+.opt-top{display:flex;align-items:center;gap:10px;cursor:pointer}
+.opt-line{display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center;font-size:.8rem;color:var(--ink-2);flex:1;min-width:0}
+.opt-labs{display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center;margin:7px 0 0 32px;font-size:.78rem}
+.opt-labs .lbl{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--ink-3)}
 .radio{appearance:none;-webkit-appearance:none;width:22px;height:22px;margin:0;flex:none;border:2px solid var(--ink);border-radius:50%;background:var(--sheet);cursor:pointer;display:grid;place-items:center}
 .radio::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--ink);transform:scale(0);transition:transform .12s}
 .radio:checked::after{transform:scale(1)}
@@ -205,13 +214,6 @@ button,input,select{font:inherit;color:inherit}
 .fit{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.15em .6em;border-radius:99px;border:1.5px solid currentColor;white-space:nowrap}
 .fit.ok{color:var(--mint-ink);background:var(--mint-soft)}
 .fit.bad{color:var(--berry-ink);background:var(--sheet)}
-.fac-secs{display:grid;gap:8px;margin:9px 0 0 32px}
-.fsec{display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center;font-size:.78rem;color:var(--ink-2)}
-.fsec.off > :not(.slot-chip){opacity:.45}
-.fsec .lbl{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--ink-3);margin-left:4px}
-button.slot-chip{cursor:pointer;font-family:inherit}
-button.slot-chip:hover{filter:brightness(.94)}
-.slot-chip.off{background:var(--sheet-2);text-decoration:line-through;border-style:dashed;color:var(--ink-3)}
 .clash-msg{margin:8px 0 0 32px;font-size:.82rem;color:var(--berry-ink);font-weight:500}
 .fac-hint{margin:8px 0 0 32px;font-size:.76rem;color:var(--ink-3)}
 .clash-box{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;border:2px solid var(--berry);border-radius:12px 9px 12px 10px;background:var(--berry-soft);font-size:.88rem}
@@ -253,7 +255,6 @@ button.lab-chip:hover{background:var(--mint)}
 .filters{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 14px;border:1.5px dashed var(--ink-4);border-radius:14px;background:var(--sheet-2)}
 .fgroup{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .flabel{font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;font-weight:600;color:var(--ink-3);margin-right:4px}
-.fac-input{width:min(240px,100%);padding:.42em .8em .42em 2.2em;background-size:.95em;background-position:.75em 50%;border-width:1.5px;font-size:.86rem}
 .sel{padding:.38em 2em .38em .75em;border:1.5px solid var(--ink);border-radius:10px 7px 10px 8px;background:var(--sheet) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%231D2340' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 8l4.5 4.5L14.5 8'/%3E%3C/svg%3E") no-repeat right .55em center/1em;appearance:none;-webkit-appearance:none;font-size:.86rem;cursor:pointer}
 .res-body{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;margin-top:18px;align-items:start}
 .stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
@@ -375,7 +376,7 @@ button.cell:hover{border-color:var(--ink);color:var(--ink)}
   .card-title{font-size:1.85rem}
   .stamp b{font-size:1.3rem}
   .brand-sub{display:none}
-  .fac-secs,.clash-msg,.fac-hint{margin-left:0}
+  .opt-labs,.clash-msg,.fac-hint{margin-left:0}
   .mine .grip{display:none}
   .mine-actions{margin-left:auto}
   .filters{gap:12px}
@@ -464,7 +465,6 @@ button.cell:hover{border-color:var(--ink);color:var(--ink)}
         <span class="res-count" id="res-count"></span>
       </div>
       <div class="filters" id="filters">
-        <div class="fgroup" role="group" aria-label="Theory timing" id="time-chips"></div>
         <div class="fgroup">
           <label class="flabel" for="sort">Sort</label>
           <select class="sel" id="sort">
@@ -761,33 +761,31 @@ const LIMIT = 2000;
 
 const facultiesOf = c => uniq(c.sections.map(s => s.fac));
 
-// One course = one faculty. `off` skips some of that faculty's sections, `labsOff` skips labs.
+// One course = one section: a faculty teaching one theory slot. Labs for that slot stay flexible.
 function normEntry(e, i) {
   const c = e && COURSE[e.id];
   if (!c) return null;
-  let fac = e.fac;
-  if (!facultiesOf(c).includes(fac)) {
-    // older saves ranked several faculty: keep the top one that was switched on
+  let sec = c.secByKey[e.sec] ? e.sec : null;
+  if (!sec) {
+    // older saves stored a faculty, and before that a ranked list: keep the first section still switched on
     const oldOff = Array.isArray(e.off) ? e.off : [];
-    const firstOn = (Array.isArray(e.order) ? e.order : []).find(k => c.secByKey[k] && !oldOff.includes(k));
-    fac = firstOn ? c.secByKey[firstOn].fac : facultiesOf(c)[0];
+    let fac = e.fac;
+    if (!facultiesOf(c).includes(fac)) {
+      const firstOn = (Array.isArray(e.order) ? e.order : []).find(k => c.secByKey[k] && !oldOff.includes(k));
+      fac = firstOn ? c.secByKey[firstOn].fac : facultiesOf(c)[0];
+    }
+    const own = c.sections.filter(x => x.fac === fac);
+    sec = (own.find(x => !oldOff.includes(x.key)) || own[0]).key;
   }
-  const keys = c.sections.filter(s => s.fac === fac).map(s => s.key);
-  const labKeys = c.labs.map(l => l.key);
-  let off = (Array.isArray(e.off) ? e.off : []).filter(k => keys.includes(k));
-  if (off.length >= keys.length) off = [];
-  return {
-    id: e.id,
-    fac,
-    color: Number.isInteger(e.color) ? ((e.color % 8) + 8) % 8 : i % 8,
-    off,
-    labsOff: (Array.isArray(e.labsOff) ? e.labsOff : []).filter(k => labKeys.includes(k))
-  };
+  const labKeys = c.secByKey[sec].labs.map(l => l.key);
+  let labsOff = (Array.isArray(e.labsOff) ? e.labsOff : []).filter(k => labKeys.includes(k));
+  if (labsOff.length >= labKeys.length) labsOff = [];
+  return { id: e.id, sec, color: Number.isInteger(e.color) ? ((e.color % 8) + 8) % 8 : i % 8, labsOff };
 }
 
 const state = {
   view: 'planner', cat: 'DC', q: '', mine: [], draft: null, restorePage: 0,
-  slotSel: [], svKind: 'th', filt: { time: 'any', sort: 'priority' }, page: 0,
+  slotSel: [], svKind: 'th', filt: { sort: 'priority' }, page: 0,
   results: [], vis: [], truncated: false, diag: null, dropped: []
 };
 
@@ -808,22 +806,13 @@ const state = {
       });
     }
     if (saved.draft && typeof saved.draft === 'object' && COURSE[saved.draft.id]) {
-      const c = COURSE[saved.draft.id];
-      const fac = facultiesOf(c).includes(saved.draft.fac) ? saved.draft.fac : facultiesOf(c)[0];
-      const keys = c.sections.filter(x => x.fac === fac).map(x => x.key);
-      const off = (Array.isArray(saved.draft.off) ? saved.draft.off : []).filter(k => keys.includes(k));
-      state.draft = {
-        id: c.id, fac,
-        off: new Set(off.length < keys.length ? off : []),
-        labsOff: new Set((Array.isArray(saved.draft.labsOff) ? saved.draft.labsOff : []).filter(k => c.labs.some(l => l.key === k))),
-        isNew: !state.mine.some(m => m.id === c.id)
-      };
+      const de = normEntry(saved.draft, 0);
+      state.draft = { id: de.id, sec: de.sec, labsOff: new Set(de.labsOff), isNew: !state.mine.some(m => m.id === de.id) };
     }
     if (Number.isInteger(saved.page) && saved.page > 0) state.restorePage = saved.page;
     if (Array.isArray(saved.slotSel)) state.slotSel = saved.slotSel.filter(n => SLOTS.has(n));
     if (saved.svKind === 'lab') state.svKind = 'lab';
     if (saved.filt && typeof saved.filt === 'object') {
-      if (['any', 'morning', 'evening', 'mixed'].includes(saved.filt.time)) state.filt.time = saved.filt.time;
       if (['priority', 'eight', 'campus'].includes(saved.filt.sort)) state.filt.sort = saved.filt.sort;
     }
   }
@@ -837,7 +826,7 @@ function save() {
   try {
     localStorage.setItem(KEY, JSON.stringify({
       view: state.view, cat: state.cat, mine: state.mine, page: state.page,
-      draft: state.draft && { id: state.draft.id, fac: state.draft.fac, off: [...state.draft.off], labsOff: [...state.draft.labsOff] },
+      draft: state.draft && { id: state.draft.id, sec: state.draft.sec, labsOff: [...state.draft.labsOff] },
       slotSel: state.slotSel, svKind: state.svKind, filt: state.filt
     }));
   } catch (e) { /* storage unavailable: the page still works for this visit */ }
@@ -852,25 +841,17 @@ function occOverlap(A, B) {
    ====================================================================== */
 function entryOptions(entry) {
   const c = COURSE[entry.id];
-  const off = new Set(entry.off), labsOff = new Set(entry.labsOff);
-  const out = [];
-  c.sections.forEach(s => {
-    if (s.fac !== entry.fac || off.has(s.key)) return;
-    if (c.labs.length) {
-      s.labs.forEach(l => {
-        if (labsOff.has(l.key)) return;
-        out.push({ entry, course: c, sec: s, lab: l, occ: s.theory ? s.theory.occ.concat(l.occ) : l.occ });
-      });
-    } else {
-      out.push({ entry, course: c, sec: s, lab: null, occ: s.theory.occ });
-    }
-  });
-  return out;
+  const s = c.secByKey[entry.sec];
+  if (!s) return [];
+  if (!c.labs.length) return [{ entry, course: c, sec: s, lab: null, occ: s.theory.occ }];
+  const labsOff = new Set(entry.labsOff);
+  return s.labs.filter(l => !labsOff.has(l.key))
+    .map(l => ({ entry, course: c, sec: s, lab: l, occ: s.theory ? s.theory.occ.concat(l.occ) : l.occ }));
 }
 
 function draftEntry() {
   const d = state.draft;
-  return { id: d.id, fac: d.fac, off: [...d.off], labsOff: [...d.labsOff] };
+  return { id: d.id, sec: d.sec, labsOff: [...d.labsOff] };
 }
 
 function metrics(p) {
@@ -974,7 +955,7 @@ function clashMessage(entry, others) {
 // Can this course be added at all (with any faculty) next to the current list?
 function canAdd(c) {
   const others = state.mine.filter(m => m.id !== c.id);
-  return facultiesOf(c).some(f => feasible(others.concat([{ id: c.id, fac: f, off: [], labsOff: [] }])));
+  return c.sections.some(x => feasible(others.concat([{ id: c.id, sec: x.key, labsOff: [] }])));
 }
 
 function diagnose(opts) {
@@ -991,7 +972,7 @@ function diagnose(opts) {
 
 function applyFilters() {
   const f = state.filt;
-  let list = state.results.filter(r => f.time === 'any' || r.m.mode === f.time);
+  let list = state.results;
   if (f.sort === 'eight') list = list.slice().sort((a, b) => a.m.eight - b.m.eight || a.m.campus - b.m.campus || a.i - b.i);
   else if (f.sort === 'campus') list = list.slice().sort((a, b) => a.m.campus - b.m.campus || a.i - b.i);
   state.vis = list;
@@ -1097,45 +1078,30 @@ function openEditor(id, scroll) {
   const c = COURSE[id];
   const ex = state.mine.find(m => m.id === id);
   if (ex) {
-    state.draft = { id, fac: ex.fac, off: new Set(ex.off), labsOff: new Set(ex.labsOff), isNew: false };
+    state.draft = { id, sec: ex.sec, labsOff: new Set(ex.labsOff), isNew: false };
   } else {
-    // start on the first faculty that fits next to the current courses
-    const facs = facultiesOf(c);
-    const fac = facs.find(f => feasible(state.mine.concat([{ id, fac: f, off: [], labsOff: [] }]))) || facs[0];
-    state.draft = { id, fac, off: new Set(), labsOff: new Set(), isNew: true };
+    // start on the first faculty + slot that fits next to the current courses
+    const s = c.sections.find(x => feasible(state.mine.concat([{ id, sec: x.key, labsOff: [] }]))) || c.sections[0];
+    state.draft = { id, sec: s.key, labsOff: new Set(), isNew: true };
   }
   renderEditor();
   renderCourseList();
   if (scroll && window.innerWidth < 920) scrollToEl($('#editor-card'));
 }
 
-function sectionHTML(c, s, sel, multiSec) {
+function labsHTML(c, s, sel) {
+  if (!s.theory || !c.labs.length) return '';
   const d = state.draft;
-  const soff = sel && d.off.has(s.key);
-  let h = '<div class="fsec' + (soff ? ' off' : '') + '">';
-  const main = s.theory ? s.theory : s.labs[0];
-  const cls = 'slot-chip ' + (s.theory ? s.theory.half : 'lab') + (soff ? ' off' : '');
-  h += sel && multiSec
-    ? '<button type="button" class="' + cls + '" data-sec="' + esc(s.key) + '" aria-pressed="' + !soff + '" title="' + (soff ? 'Skipped. Tap to include ' : 'Tap to leave out ') + main.slot + '">' + main.slot + '</button>'
-    : '<span class="' + cls + '">' + main.slot + '</span>';
-  h += '<span>' + esc(main.venue) + '</span>';
-  if (s.theory) {
-    h += '<span>' + whenShort(s.theory.slot) + '</span>';
-    if (c.labs.length) {
-      h += '<span class="lbl">Lab</span>';
-      if (s.noLab) h += '<span class="warn">No lab listed for this faculty</span>';
-      else h += s.labs.map(l => {
-        const lo = sel && d.labsOff.has(l.key);
-        const inner = l.slot + '<small>' + DAYS[l.occ[0][0]] + ' ' + fmtShort(l.occ[0][1]) + '</small>';
-        const title = esc(l.slot + ' · ' + whenLong(l.slot) + ' · ' + l.venue);
-        return sel && s.labs.length > 1 && !soff
-          ? '<button type="button" class="lab-chip' + (lo ? ' off' : '') + '" data-lab="' + esc(l.key) + '" aria-pressed="' + !lo + '" title="' + title + (lo ? ' (left out)' : '') + '">' + inner + '</button>'
-          : '<span class="lab-chip" title="' + title + '">' + inner + '</span>';
-      }).join('');
-    }
-  } else {
-    h += '<span>' + DAYS[main.occ[0][0]] + ' ' + fmtRange(main.occ[0][1], main.occ[0][2]) + '</span>';
-  }
+  let h = '<div class="opt-labs"><span class="lbl">Lab</span>';
+  if (s.noLab) return h + '<span class="warn">No lab listed for this faculty</span></div>';
+  h += s.labs.map(l => {
+    const lo = sel && d.labsOff.has(l.key);
+    const inner = l.slot + '<small>' + DAYS[l.occ[0][0]] + ' ' + fmtShort(l.occ[0][1]) + '</small>';
+    const title = esc(l.slot + ' · ' + whenLong(l.slot) + ' · ' + l.venue);
+    return sel && s.labs.length > 1
+      ? '<button type="button" class="lab-chip' + (lo ? ' off' : '') + '" data-lab="' + esc(l.key) + '" aria-pressed="' + !lo + '" title="' + title + (lo ? ' (left out)' : '') + '">' + inner + '</button>'
+      : '<span class="lab-chip" title="' + title + '">' + inner + '</span>';
+  }).join('');
   return h + '</div>';
 }
 
@@ -1146,47 +1112,54 @@ function renderEditor() {
     el.innerHTML = '<div class="empty">' +
       '<svg viewBox="0 0 96 56" aria-hidden="true"><path d="M90 40c-18 10-44 10-62-6C18 25 14 16 12 8M12 8 6 18M12 8l9 7"/></svg>' +
       '<span class="big">Pick a course from the list</span>' +
-      '<p>Its faculty and slots show up here. Choose one faculty and every slot they teach gets tried.</p></div>';
+      '<p>Its faculty and slots show up here. Choose one faculty and one theory slot, and every lab that goes with it gets tried.</p></div>';
+    save();
     return;
   }
   const c = COURSE[d.id];
   const others = state.mine.filter(m => m.id !== d.id);
-  const facs = facultiesOf(c);
+  const isLabOnly = !c.theory.length;
   let selMsg = null, fitN = 0;
-  const cards = facs.map((f, fi) => {
-    const sel = d.fac === f;
+  const cards = facultiesOf(c).map(f => {
     const secs = c.sections.filter(s => s.fac === f);
-    const multiSec = secs.length > 1;
-    const anyToggle = multiSec || secs.some(s => s.theory && s.labs.length > 1);
-    const msg = clashMessage(sel ? draftEntry() : { id: c.id, fac: f, off: [], labsOff: [] }, others);
-    if (sel) selMsg = msg;
-    if (!msg) fitN++;
-    const id = 'fac-' + c.id + '-' + fi;
-    const fit = others.length ? '<span class="fit ' + (msg ? 'bad' : 'ok') + '">' + (msg ? 'Slot clash' : 'Fits') + '</span>' : '';
-    return '<div class="fac' + (sel ? ' sel' : '') + (msg ? ' bad' : '') + '">' +
-      '<label class="fac-top" for="' + id + '"><input type="radio" class="radio" name="fac-' + c.id + '" id="' + id + '" value="' + fi + '"' + (sel ? ' checked' : '') + '>' +
-      '<span class="fac-name">' + esc(f) + '</span>' + fit + '</label>' +
-      '<div class="fac-secs">' + secs.map(s => sectionHTML(c, s, sel, multiSec)).join('') + '</div>' +
-      (msg ? '<p class="clash-msg">' + esc(msg) + '</p>' : '') +
-      (sel && anyToggle ? '<p class="fac-hint">Every slot here is tried. Tap a slot to leave it out.</p>' : '') +
-      '</div>';
+    const opts = secs.map(s => {
+      const idx = c.sections.indexOf(s);
+      const sel = s.key === d.sec;
+      const msg = clashMessage(sel ? draftEntry() : { id: c.id, sec: s.key, labsOff: [] }, others);
+      if (sel) selMsg = msg;
+      if (!msg) fitN++;
+      const id = 'opt-' + c.id + '-' + idx;
+      const main = s.theory || s.labs[0];
+      const when = s.theory ? whenShort(s.theory.slot) : DAYS[main.occ[0][0]] + ' ' + fmtRange(main.occ[0][1], main.occ[0][2]);
+      const fit = others.length ? '<span class="fit ' + (msg ? 'bad' : 'ok') + '">' + (msg ? 'Slot clash' : 'Fits') + '</span>' : '';
+      return '<div class="opt' + (sel ? ' sel' : '') + (msg ? ' bad' : '') + '">' +
+        '<label class="opt-top" for="' + id + '"><input type="radio" class="radio" name="sec-' + c.id + '" id="' + id + '" value="' + idx + '"' + (sel ? ' checked' : '') + '>' +
+        '<span class="opt-line"><span class="slot-chip ' + (s.theory ? s.theory.half : 'lab') + '">' + main.slot + '</span><span>' + esc(main.venue) + '</span><span>' + when + '</span></span>' + fit + '</label>' +
+        labsHTML(c, s, sel) +
+        (sel && s.theory && s.labs.length > 1 ? '<p class="fac-hint">All ' + s.labs.length + ' labs are tried. Tap one to leave it out.</p>' : '') +
+        (msg ? '<p class="clash-msg">' + esc(msg) + '</p>' : '') +
+        '</div>';
+    }).join('');
+    return '<div class="fac' + (secs.some(s => s.key === d.sec) ? ' sel' : '') + '">' +
+      '<div class="fac-head"><span class="fac-name">' + esc(f) + '</span>' + (secs.length > 1 ? '<span class="fac-count">' + secs.length + ' slots, pick one</span>' : '') + '</div>' +
+      '<div class="opts">' + opts + '</div></div>';
   }).join('');
 
-  const codes = c.codes.join(' + ');
+  const total = c.sections.length;
   const sub = c.labTitle ? 'Lab: ' + esc(c.labTitle) : '';
-  const fix = fitN ? ' Pick a faculty marked Fits instead.' : ' Remove the clashing course first if you want this one.';
+  const fix = fitN ? ' Pick an option marked Fits instead.' : ' Remove the clashing course first if you want this one.';
   el.innerHTML =
-    '<div class="ed-head"><div><div class="ed-codes">' + codes + ' · ' + CATS.find(x => x.id === c.cat).name + '</div><h3>' + esc(c.name) + '</h3>' +
+    '<div class="ed-head"><div><div class="ed-codes">' + c.codes.join(' + ') + ' · ' + CATS.find(x => x.id === c.cat).name + '</div><h3>' + esc(c.name) + '</h3>' +
       '<div class="ed-tags"><span class="tag ' + kindCls(c) + '">' + kindLabel(c) + '</span>' + (sub ? '<span>' + sub + '</span>' : '') + '</div></div>' +
       '<div class="ed-cred">' + credNum(c.credits) + '<small>credits</small></div></div>' +
-    '<p class="note ed-note">' + (facs.length > 1 ? 'Pick one faculty. All of their slots and labs are tried.' : 'Only one faculty teaches this course.') + '</p>' +
-    '<div class="facs" role="radiogroup" aria-label="Faculty">' + cards + '</div>' +
+    '<p class="note ed-note">' + (isLabOnly ? 'Pick one lab slot.' : 'Pick one faculty and one theory slot. Every lab that goes with that slot is tried.') + '</p>' +
+    '<div class="facs" role="radiogroup" aria-label="Faculty and slot">' + cards + '</div>' +
     (selMsg ? '<div class="clash-box"><span class="hand">Slot clash!</span><span>' + esc(selMsg) + (others.length ? fix : '') + '</span></div>' : '') +
     '<div class="ed-foot">' +
       '<button type="button" class="btn btn-sun' + (selMsg ? ' blocked' : '') + '" id="ed-save" aria-disabled="' + !!selMsg + '">' + (d.isNew ? 'Add to my courses' : 'Save changes') + '</button>' +
       (d.isNew ? '' : '<button type="button" class="btn btn-soft" id="ed-remove">Remove course</button>') +
       '<button type="button" class="btn btn-plain" id="ed-close">Close</button>' +
-      '<span class="count">' + (others.length ? fitN + ' of ' + facs.length + ' faculty fit' : facs.length + ' faculty') + '</span>' +
+      '<span class="count">' + (others.length ? fitN + ' of ' + total + ' options fit' : total + (total === 1 ? ' option' : ' options')) + '</span>' +
     '</div>';
   save();
 }
@@ -1213,7 +1186,8 @@ function commitDraft() {
   save();
   renderAllPlanner();
   const n = state.results.length;
-  toast((wasNew ? 'Added ' : 'Saved ') + c.name + ' with ' + entry.fac + '. ' + n + (state.truncated ? '+' : '') + (n === 1 ? ' timetable' : ' timetables') + ' ready.');
+  const sec = c.secByKey[entry.sec];
+  toast((wasNew ? 'Added ' : 'Saved ') + c.name + ' (' + sec.fac + ', ' + (sec.theory ? sec.theory.slot : sec.labs[0].slot) + '). ' + n + (state.truncated ? '+' : '') + (n === 1 ? ' timetable' : ' timetables') + ' ready.');
 }
 
 /* ======================================================================
@@ -1226,15 +1200,16 @@ function renderMine() {
   } else {
     ol.innerHTML = state.mine.map((e, i) => {
       const c = COURSE[e.id];
-      const opts = entryOptions(e);
-      const slotsOn = uniq(opts.map(o => o.sec.theory ? o.sec.theory.slot : o.lab.slot));
+      const sec = c.secByKey[e.sec];
+      const labs = entryOptions(e).filter(o => o.lab && sec.theory).map(o => o.lab.slot);
+      const main = sec.theory || sec.labs[0];
       return '<li class="mine" draggable="true" data-i="' + i + '" style="--c:var(--c' + (e.color + 1) + ')">' +
         ic('grip', 'grip') +
         '<span class="rank" aria-hidden="true">' + (i + 1) + '</span>' +
         '<span class="sw" aria-hidden="true"></span>' +
         '<div class="mine-body"><div class="mine-codes">' + c.codes.join(' + ') + '</div><div class="mine-name">' + esc(c.name) + '</div>' +
-          '<div class="mine-sub"><span>' + esc(e.fac) + '</span><span>' + slotsOn.join(' / ') + '</span>' +
-            (opts.length > 1 ? '<span class="muted">' + opts.length + ' slot options</span>' : '') + '</div></div>' +
+          '<div class="mine-sub"><span>' + esc(sec.fac) + '</span><span class="slot-chip ' + (sec.theory ? sec.theory.half : 'lab') + '">' + main.slot + '</span>' +
+            (labs.length ? '<span>Lab ' + labs.join(' or ') + '</span>' : '') + '</div></div>' +
         '<span class="mine-cred">' + credNum(c.credits) + ' cr</span>' +
         '<div class="mine-actions">' +
           '<button type="button" class="icon-btn" data-act="edit" aria-label="Edit ' + esc(c.name) + '">' + ic('edit') + '</button>' +
@@ -1258,15 +1233,7 @@ function renderMineFoot() {
 /* ======================================================================
    Planner: step 4 (results)
    ====================================================================== */
-function renderTimeChips() {
-  const base = state.results;
-  const count = k => k === 'any' ? base.length : base.filter(r => r.m.mode === k).length;
-  $('#time-chips').innerHTML = '<span class="flabel">Theory</span>' + [['any', 'Any'], ['morning', 'Morning'], ['evening', 'Evening'], ['mixed', 'Mixed']]
-    .map(([k, t]) => '<button type="button" class="chip" data-time="' + k + '" aria-pressed="' + (state.filt.time === k) + '">' + t + ' <span class="n">' + count(k) + '</span></button>').join('');
-}
-
 function renderResults() {
-  renderTimeChips();
   const box = $('#results');
   const total = state.results.length;
   $('#res-count').textContent = total ? total + (state.truncated ? '+' : '') + (total === 1 ? ' timetable' : ' timetables') : '';
@@ -1279,12 +1246,6 @@ function renderResults() {
   if (!total) {
     box.innerHTML = '<div class="res-empty"><span class="big">No timetable fits yet</span><ul>' + (state.diag || []).map(m => '<li>' + m + '</li>').join('') + '</ul>' +
       '<p>Edit or remove one of the courses listed above.</p></div>';
-    return;
-  }
-  if (!state.vis.length) {
-    const t = { morning: 'morning', evening: 'evening', mixed: 'mixed' }[state.filt.time];
-    box.innerHTML = '<div class="res-empty"><span class="big">No ' + t + ' timetables</span><p>' + total + (total === 1 ? ' timetable was' : ' timetables were') + ' made, but none has only ' + t + ' theory with your current faculty.</p>' +
-      '<button type="button" class="btn btn-sun" id="reset-filters">Show all timetables</button></div>';
     return;
   }
 
@@ -1523,10 +1484,9 @@ $('#course-list').addEventListener('click', e => {
 $('#editor').addEventListener('change', e => {
   if (!e.target.classList.contains('radio')) return;
   const d = state.draft;
-  const f = facultiesOf(COURSE[d.id])[+e.target.value];
-  if (!f || f === d.fac) return;
-  d.fac = f;
-  d.off = new Set();
+  const s = COURSE[d.id].sections[+e.target.value];
+  if (!s || s.key === d.sec) return;
+  d.sec = s.key;
   d.labsOff = new Set();
   renderEditor();
   const again = document.getElementById(e.target.id);
@@ -1536,24 +1496,12 @@ $('#editor').addEventListener('click', e => {
   const d = state.draft;
   if (!d) return;
   const t = e.target;
-  const c = COURSE[d.id];
-  const sec = t.closest('[data-sec]');
-  if (sec) {
-    const k = sec.dataset.sec;
-    if (d.off.has(k)) d.off.delete(k);
-    else if (c.sections.filter(s => s.fac === d.fac && !d.off.has(s.key)).length > 1) d.off.add(k);
-    else { toast('Keep at least one slot for this faculty.'); return; }
-    renderEditor();
-    const again = $('#editor [data-sec="' + CSS.escape(k) + '"]');
-    if (again) again.focus();
-    return;
-  }
   const lab = t.closest('[data-lab]');
   if (lab) {
     const k = lab.dataset.lab;
-    const s = c.sections.find(x => x.fac === d.fac && x.labs.some(l => l.key === k));
+    const s = COURSE[d.id].secByKey[d.sec];
     if (d.labsOff.has(k)) d.labsOff.delete(k);
-    else if (s && s.labs.filter(l => !d.labsOff.has(l.key)).length > 1) d.labsOff.add(k);
+    else if (s.labs.filter(l => !d.labsOff.has(l.key)).length > 1) d.labsOff.add(k);
     else { toast('Keep at least one lab for this slot.'); return; }
     renderEditor();
     const again = $('#editor [data-lab="' + CSS.escape(k) + '"]');
@@ -1613,15 +1561,6 @@ $('#remove-all').addEventListener('click', e => {
 });
 
 // step 4
-$('#filters').addEventListener('click', e => {
-  const b = e.target.closest('[data-time]');
-  if (!b) return;
-  state.filt.time = b.dataset.time;
-  state.page = 0;
-  save();
-  applyFilters();
-  renderResults();
-});
 $('#sort').addEventListener('change', e => { state.filt.sort = e.target.value; state.page = 0; save(); applyFilters(); renderResults(); });
 $('#results').addEventListener('click', e => {
   const pg = e.target.closest('[data-pg]');
@@ -1634,10 +1573,6 @@ $('#results').addEventListener('click', e => {
     return;
   }
   if (e.target.closest('#copy-tt')) { copyText(timetableText(), 'Timetable copied. Paste it anywhere.'); return; }
-  if (e.target.closest('#reset-filters')) {
-    state.filt.time = 'any';
-    save(); applyFilters(); renderResults();
-  }
 });
 document.addEventListener('keydown', e => {
   if (state.view !== 'planner' || !state.vis.length) return;

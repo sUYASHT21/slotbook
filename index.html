@@ -582,7 +582,14 @@ const fmtT = (u, ap = true) => { const c = clock(u); return c.h12 + ':' + pad(c.
 const fmtShort = u => { const c = clock(u); return c.h12 + (c.m ? ':' + pad(c.m) : '') + (c.pm ? ' PM' : ' AM'); };
 const fmtRange = (s, e) => clock(s).pm === clock(e).pm ? fmtT(s, false) + '–' + fmtT(e) : fmtT(s) + '–' + fmtT(e);
 
-const slotParts = str => { const p = str.split('+').map(x => x.trim()); return p[0][0] === 'L' ? [p[0] + '+' + p[1]] : p; };
+// Theory: 'A1+TA1' -> ['A1', 'TA1']. Labs come in pairs: 'L31+L32+L41+L42' -> ['L31+L32', 'L41+L42'].
+const slotParts = str => {
+  const p = str.split('+').map(x => x.trim());
+  if (p[0][0] !== 'L') return p;
+  const out = [];
+  for (let i = 0; i + 1 < p.length; i += 2) out.push(p[i] + '+' + p[i + 1]);
+  return out;
+};
 const slotOcc = str => slotParts(str).flatMap(nm => { const s = SLOTS.get(nm); if (!s) { console.warn('Unknown slot', nm); return []; } return s.occ; });
 const whenShort = str => slotOcc(str).map(([d, s]) => DAYS[d] + ' ' + fmtShort(s)).join(' · ');
 const whenLong = str => slotOcc(str).map(([d, s, e]) => DAY_FULL[d] + ' ' + fmtRange(s, e)).join(', ');
@@ -592,97 +599,268 @@ const whenLong = str => slotOcc(str).map(([d, s, e]) => DAY_FULL[d] + ' ' + fmtR
    kind: TH theory (lab may be a separate P code), ETH embedded theory+lab,
          LO lab only, SS soft skill
    rows: [slot, venue, faculty]
+   FC, DC and DE are generated from the VTOP allocation export; OE is kept by hand.
    ====================================================================== */
 const CATS = [
+  { id: 'FC', name: 'Foundation Core' },
   { id: 'DC', name: 'Discipline Core' },
   { id: 'DE', name: 'Discipline Elective' },
   { id: 'OE', name: 'Open Elective' }
 ];
 const RAW = [
-  { id: 'BEEE309', cat: 'DC', kind: 'TH', name: 'Microprocessors and Microcontrollers', codes: ['BEEE309L', 'BEEE309P'], labTitle: 'Microprocessors and Microcontrollers Lab',
+  { id: 'BARB101L', cat: 'FC', kind: 'TH', name: 'Arabic', codes: ['BARB101L'],
     theory: [
-      ['A2+TA2', 'TT204', 'CHILUKURI VENKATA MAHENDRA'],
-      ['A1+TA1', 'TT201', 'BALAMURUGAN M'],
-      ['A2+TA2', 'TT434A', 'RAMA PRABHA D'],
-      ['A1+TA1', 'TT204', 'MADDELA CHINNA OBAIAH'],
-      ['A2+TA2', 'TT201', 'BALAMURUGAN M'],
-      ['A1+TA1', 'TT434A', 'CHILUKURI VENKATA MAHENDRA']],
-    labs: [
-      ['L15+L16', 'TT515', 'RAMA PRABHA D'],
-      ['L33+L34', 'TT515', 'BALAMURUGAN M'],
-      ['L41+L42', 'TT515', 'BALAMURUGAN M'],
-      ['L9+L10', 'TT515', 'BALAMURUGAN M'],
-      ['L49+L50', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
-      ['L57+L58', 'TT515', 'MADDELA CHINNA OBAIAH'],
-      ['L39+L40', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
-      ['L19+L20', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
-      ['L43+L44', 'TT515', 'MADDELA CHINNA OBAIAH'],
-      ['L29+L30', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
-      ['L23+L24', 'TT515', 'RAMA PRABHA D'],
-      ['L25+L26', 'TT515', 'BALAMURUGAN M']] },
-  { id: 'BEEE308L', cat: 'DC', kind: 'TH', name: 'Communication Systems', codes: ['BEEE308L'],
-    theory: [
-      ['D1+TD1', 'TT434A', 'RAJINI G.K'],
-      ['D2+TD2', 'TT201', 'BALAJI S'],
-      ['D1+TD1', 'TT201', 'BALAJI S'],
-      ['D2+TD2', 'TT434A', 'ABHISHEK G']],
+      ['B2', 'PRP230', 'MOHD SAQIB'],
+      ['C1', 'PRP230', 'MOHD SAQIB']],
     labs: [] },
+  { id: 'BCHI101L', cat: 'FC', kind: 'TH', name: 'Chinese I', codes: ['BCHI101L'],
+    theory: [
+      ['G1', 'PRP104', 'KHANA BAIDYA'],
+      ['F2', 'SJT105', 'KHANA BAIDYA']],
+    labs: [] },
+  { id: 'BCHY101', cat: 'FC', kind: 'TH', name: 'Engineering Chemistry', codes: ['BCHY101L', 'BCHY101P'], labTitle: 'Engineering Chemistry Lab',
+    theory: [
+      ['G2+TG2', 'PRP630', 'SATHISH KUMAR P'],
+      ['G1+TG1', 'PRP434', 'ATANU CHAKRABORTY']],
+    labs: [
+      ['L15+L16', 'PRP408A', 'ASHINA CHANDRAN'],
+      ['L45+L46', 'PRP408A', 'ASHINA CHANDRAN'],
+      ['L15+L16', 'PRP408A', 'SATHISH KUMAR P'],
+      ['L45+L46', 'PRP408A', 'ATANU CHAKRABORTY']] },
+  { id: 'BCLE212L', cat: 'FC', kind: 'TH', name: 'Natural Disaster Mitigation and Management', codes: ['BCLE212L'],
+    theory: [
+      ['G1+TG1', 'CDMM104', 'MEENA T']],
+    labs: [] },
+  { id: 'BCLE214L', cat: 'FC', kind: 'TH', name: 'Global Warming', codes: ['BCLE214L'],
+    theory: [
+      ['F2+TF2', 'CDMM105', 'KAVITHA M.S'],
+      ['G1+TG1', 'CDMM403', 'VIGNESH RAJKUMAR L']],
+    labs: [] },
+  { id: 'BCLE216L', cat: 'FC', kind: 'TH', name: 'Water Resource Management', codes: ['BCLE216L'],
+    theory: [
+      ['D2+TD2', 'CDMM104', 'MAHENTHIRAN S'],
+      ['D1+TD1', 'CDMM105', 'PARIMALA RENGANAYAKI S'],
+      ['D1+TD1', 'CDMM104', 'VIGNESH RAJKUMAR L']],
+    labs: [] },
+  { id: 'BCSE101E', cat: 'FC', kind: 'ETH', name: 'Computer Programming: Python', codes: ['BCSE101E'],
+    theory: [
+      ['TCC1', 'SJT301', 'KAVITHA G']],
+    labs: [
+      ['L31+L32+L41+L42', 'SJT318', 'KAVITHA G']] },
+  { id: 'BCSE103E', cat: 'FC', kind: 'ETH', name: 'Computer Programming: Java', codes: ['BCSE103E'],
+    theory: [
+      ['TAA1', 'PRP125', 'MOHAMED YOUSUFF A R'],
+      ['TAA2', 'SJT304', 'UMA PRIYA D']],
+    labs: [
+      ['L35+L36+L51+L52', 'PRP234', 'MOHAMED YOUSUFF A R'],
+      ['L5+L6+L19+L20', 'SJT416', 'UMA PRIYA D']] },
+  { id: 'BEEE102', cat: 'FC', kind: 'TH', name: 'Basic Electrical and Electronics Engineering', codes: ['BEEE102L', 'BEEE102P'], labTitle: 'Basic Electrical and Electronics Engineering Lab',
+    theory: [
+      ['E1+TE1', 'TT404', 'BELWIN EDWARD J'],
+      ['E2+TE2', 'TT404', 'MEIKANDASIVAM S']],
+    labs: [
+      ['L31+L32', 'TT344', 'BELWIN EDWARD J'],
+      ['L51+L52', 'TT344', 'BELWIN EDWARD J'],
+      ['L23+L24', 'TT344', 'MEIKANDASIVAM S'],
+      ['L5+L6', 'TT344', 'MEIKANDASIVAM S']] },
+  { id: 'BENG101', cat: 'FC', kind: 'TH', name: 'Technical English Communication', codes: ['BENG101L', 'BENG101P'], labTitle: 'Technical English Communication Lab',
+    theory: [
+      ['C2', 'SJT409', 'DENISH RAJA DURAI K']],
+    labs: [
+      ['L23+L24', 'PRP249', 'DENISH RAJA DURAI K']] },
+  { id: 'BENG102P', cat: 'FC', kind: 'LO', name: 'Technical Report Writing', codes: ['BENG102P'],
+    theory: [],
+    labs: [
+      ['L23+L24', 'TT432', 'ANBURAJ G']] },
+  { id: 'BESP101L', cat: 'FC', kind: 'TH', name: 'Spanish I', codes: ['BESP101L'],
+    theory: [
+      ['B1', 'SJT409', 'SHILPI GUPTA'],
+      ['F2', 'SJT222', 'NUPUR MANASI'],
+      ['B1', 'SJT201', 'BAISHALI CHOUDHURI'],
+      ['F1', 'SJT126', 'NUPUR MANASI'],
+      ['B1', 'SMV123', 'SABYASACHI MISHRA']],
+    labs: [] },
+  { id: 'BFRE101L', cat: 'FC', kind: 'TH', name: 'French I', codes: ['BFRE101L'],
+    theory: [
+      ['B2', 'PRP223', 'SHANTANU SHANDILYA'],
+      ['E2', 'SMV130', 'MALATHY O'],
+      ['F1', 'PRP429', 'SHANTANU SHANDILYA'],
+      ['E1', 'TT104', 'COUMARAN G'],
+      ['F1', 'SMV101', 'COUMARAN G']],
+    labs: [] },
+  { id: 'BGER101L', cat: 'FC', kind: 'TH', name: 'German I', codes: ['BGER101L'],
+    theory: [
+      ['F1', 'SJT302', 'ABHIJIT KR DARBEY'],
+      ['F1', 'SJT709', 'AMIT KUMAR SAINI'],
+      ['G2', 'SJT415', 'DHANANJAY KUMAR'],
+      ['A2', 'SJT315', 'ABHIJIT KR DARBEY'],
+      ['F1', 'SJT303', 'DHANANJAY KUMAR'],
+      ['A2', 'SJT127', 'ARATI KUMARI'],
+      ['B2', 'SJT202', 'ARATI KUMARI']],
+    labs: [] },
+  { id: 'BHUM108L', cat: 'FC', kind: 'TH', name: 'Urban Community Development', codes: ['BHUM108L'],
+    theory: [
+      ['B2+TB2', 'SJT409', 'BALAMURUGAN J']],
+    labs: [] },
+  { id: 'BJAP101L', cat: 'FC', kind: 'TH', name: 'Japanese I', codes: ['BJAP101L'],
+    theory: [
+      ['A2', 'SJT405', 'KHANJAN'],
+      ['C2', 'SMV214', 'HIYA MUKHERJEE']],
+    labs: [] },
+  { id: 'BMAT101', cat: 'FC', kind: 'TH', name: 'Calculus', codes: ['BMAT101L', 'BMAT101P'], labTitle: 'Calculus Lab',
+    theory: [
+      ['D2+TD2', 'SJT223', 'GORINTLA SUCHARITHA']],
+    labs: [
+      ['L3+L4', 'PRP447', 'GORINTLA SUCHARITHA']] },
+  { id: 'BMAT102L', cat: 'FC', kind: 'TH', name: 'Differential Equations and Transforms', codes: ['BMAT102L'],
+    theory: [
+      ['B2+TB2+TBB2', 'SJT407', 'AKELLA VENKATA SURYANARAYANA MURTY'],
+      ['C1+TC1+TCC1', 'SJT617', 'INDHIRA K']],
+    labs: [] },
+  { id: 'BMAT201L', cat: 'FC', kind: 'TH', name: 'Complex Variables and Linear Algebra', codes: ['BMAT201L'],
+    theory: [
+      ['C1+TC1+TCC1', 'SJT415', 'MURUGUSUNDARAMOORTHY G'],
+      ['C2+TC2+TCC2', 'SJT405', 'VIJAYA K']],
+    labs: [] },
+  { id: 'BMAT202', cat: 'FC', kind: 'TH', name: 'Probability and Statistics', codes: ['BMAT202L', 'BMAT202P'], labTitle: 'Probability and Statistics Lab',
+    theory: [
+      ['G2+TG2', 'TT523', 'INDHIRA K'],
+      ['G1+TG1', 'SMV123', 'DINESH KUMAR S']],
+    labs: [
+      ['L55+L56', 'PRP119', 'DINESH KUMAR S']] },
+  { id: 'BMGT101L', cat: 'FC', kind: 'TH', name: 'Principles of Management', codes: ['BMGT101L'],
+    theory: [
+      ['C1+TC1', 'MB229', 'NATARAJ G']],
+    labs: [] },
+  { id: 'BPHY101', cat: 'FC', kind: 'TH', name: 'Engineering Physics', codes: ['BPHY101L', 'BPHY101P'], labTitle: 'Engineering Physics Lab',
+    theory: [
+      ['B2+TB2', 'TT413', 'RAJAN BABU D']],
+    labs: [
+      ['L23+L24', 'TT420', 'RAJAN BABU D']] },
+  { id: 'BSTS101P', cat: 'FC', kind: 'SS', name: 'Quantitative Skills Practice I', codes: ['BSTS101P'],
+    theory: [
+      ['D2+TD2', 'TT415', 'ETHNUS (APT)']],
+    labs: [] },
+  { id: 'BSTS102P', cat: 'FC', kind: 'SS', name: 'Quantitative Skills Practice II', codes: ['BSTS102P'],
+    theory: [
+      ['D1+TD1', 'SJT101', 'ETHNUS (APT)']],
+    labs: [] },
+  { id: 'BSTS201P', cat: 'FC', kind: 'SS', name: 'Qualitative Skills Practice I', codes: ['BSTS201P'],
+    theory: [
+      ['D2+TD2', 'TT414', 'FACE (APT)']],
+    labs: [] },
+  { id: 'BSTS202P', cat: 'FC', kind: 'SS', name: 'Qualitative Skills Practice II', codes: ['BSTS202P'],
+    theory: [
+      ['D1+TD1', 'SJT222', 'FACE (APT)']],
+    labs: [] },
+
+  { id: 'BEEE302', cat: 'DC', kind: 'TH', name: 'Digital Signal Processing', codes: ['BEEE302L', 'BEEE302P'], labTitle: 'Digital Signal Processing Lab',
+    theory: [
+      ['G2+TG2', 'TT104', 'RAJINI G.K']],
+    labs: [
+      ['L11+L12', 'TT515', 'RAJINI G.K']] },
+  { id: 'BEEE303', cat: 'DC', kind: 'TH', name: 'Control Systems', codes: ['BEEE303L', 'BEEE303P'], labTitle: 'Control Systems Lab',
+    theory: [
+      ['G1+TG1', 'TT104', 'JANAKI M']],
+    labs: [
+      ['L33+L34', 'TT045', 'JANAKI M']] },
+  { id: 'BEEE306', cat: 'DC', kind: 'TH', name: 'Power Systems Analysis', codes: ['BEEE306L', 'BEEE306P'], labTitle: 'Power Systems Analysis Lab',
+    theory: [
+      ['E2+TE2', 'TT434A', 'ARUN S L']],
+    labs: [
+      ['L13+L14', 'TT247A', 'ARUN S L']] },
   { id: 'BEEE307', cat: 'DC', kind: 'TH', name: 'Electric Drives', codes: ['BEEE307L', 'BEEE307P'], labTitle: 'Power Electronics and Drives Lab',
     theory: [
       ['B1+TB1', 'TT434A', 'POOMPAVAI T'],
       ['B2+TB2', 'TT504', 'RAZIA SULTANA W'],
       ['B1+TB1', 'TT201', 'GOPINATH M']],
     labs: [
+      ['L39+L40', 'TT044', 'POOMPAVAI T'],
       ['L15+L16', 'TT044', 'RAZIA SULTANA W'],
       ['L27+L28', 'TT044', 'RAZIA SULTANA W'],
       ['L55+L56', 'TT044', 'POOMPAVAI T'],
       ['L49+L50', 'TT044', 'GOPINATH M'],
-      ['L39+L40', 'TT044', 'POOMPAVAI T'],
       ['L37+L38', 'TT044', 'GOPINATH M']] },
-  // id kept from when only the lab was listed, so saved lists still find it
+  { id: 'BEEE308L', cat: 'DC', kind: 'TH', name: 'Communication Systems', codes: ['BEEE308L'],
+    theory: [
+      ['D2+TD2', 'TT201', 'BALAJI S'],
+      ['D1+TD1', 'TT201', 'BALAJI S'],
+      ['D2+TD2', 'TT434A', 'ABHISHEK G'],
+      ['D1+TD1', 'TT434A', 'RAJINI G.K']],
+    labs: [] },
+  { id: 'BEEE309', cat: 'DC', kind: 'TH', name: 'Microprocessors and Microcontrollers', codes: ['BEEE309L', 'BEEE309P'], labTitle: 'Microprocessors and Microcontrollers Lab',
+    theory: [
+      ['A1+TA1', 'TT204', 'MADDELA CHINNA OBAIAH'],
+      ['A2+TA2', 'TT204', 'CHILUKURI VENKATA MAHENDRA'],
+      ['A1+TA1', 'TT201', 'BALAMURUGAN M'],
+      ['A2+TA2', 'TT434A', 'RAMA PRABHA D'],
+      ['A2+TA2', 'TT201', 'BALAMURUGAN M'],
+      ['A1+TA1', 'TT434A', 'CHILUKURI VENKATA MAHENDRA']],
+    labs: [
+      ['L57+L58', 'TT515', 'MADDELA CHINNA OBAIAH'],
+      ['L15+L16', 'TT515', 'RAMA PRABHA D'],
+      ['L33+L34', 'TT515', 'BALAMURUGAN M'],
+      ['L41+L42', 'TT515', 'BALAMURUGAN M'],
+      ['L9+L10', 'TT515', 'BALAMURUGAN M'],
+      ['L49+L50', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L39+L40', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L19+L20', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L43+L44', 'TT515', 'MADDELA CHINNA OBAIAH'],
+      ['L29+L30', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L25+L26', 'TT515', 'BALAMURUGAN M'],
+      ['L23+L24', 'TT515', 'RAMA PRABHA D']] },
   { id: 'BEEE312P', cat: 'DC', kind: 'TH', name: 'AC Machines', codes: ['BEEE312L', 'BEEE312P'], labTitle: 'AC Machines Lab',
-    theory: [['E1', '', 'ANBARASAN P']],
-    labs: [['L31+L32', 'TT035', 'ANBARASAN P']] },
-  { id: 'BEEE303', cat: 'DC', kind: 'TH', name: 'Control Systems', codes: ['BEEE303L', 'BEEE303P'], labTitle: 'Control Systems Lab',
-    theory: [['G1+TG1', 'TT104', 'JANAKI M']],
-    labs: [['L33+L34', 'TT045', 'JANAKI M']] },
-  { id: 'BEEE306', cat: 'DC', kind: 'TH', name: 'Power System Analysis', codes: ['BEEE306L', 'BEEE306P'], labTitle: 'Power System Analysis Lab',
-    theory: [['E2+TE2', '', 'ARUN S.L.']],
-    labs: [['L13+L14', '', 'ARUN S.L.']] },
-  { id: 'BEEE302', cat: 'DC', kind: 'TH', name: 'Digital Signal Processing', codes: ['BEEE302L', 'BEEE302P'], labTitle: 'Digital Signal Processing Lab',
-    theory: [['G2+TG2', '', 'RAJNI G.K.']],
-    labs: [['L11+L12', '', 'RAJNI G.K.']] },
+    theory: [
+      ['E1', 'TT434A', 'ANBARASAN P']],
+    labs: [
+      ['L31+L32', 'TT035', 'ANBARASAN P']] },
 
   { id: 'BECE320E', cat: 'DE', kind: 'ETH', name: 'Embedded C Programming', codes: ['BECE320E'],
     theory: [
-      ['C2', 'TT434A', 'PONNAMBALAM P'],
-      ['C1', 'TT434A', 'MARIMUTHU R'],
-      ['C1', 'TT201', 'GOMATHI K'],
-      ['C2', 'TT201', 'SELVAKUMAR K'],
       ['C2', 'TT434', 'GOMATHI K'],
+      ['C2', 'TT434A', 'PONNAMBALAM P'],
       ['C1', 'TT204', 'JAKEER HUSSAIN'],
-      ['C1', 'TT434', 'GOPINATH M']],
+      ['C1', 'TT434', 'GOPINATH M'],
+      ['C1', 'TT434A', 'MARIMUTHU R'],
+      ['C2', 'TT201', 'SELVAKUMAR K'],
+      ['C1', 'TT201', 'GOMATHI K']],
     labs: [
-      ['L31+L32', 'TT247A', 'GOMATHI K'],
+      ['L19+L20', 'TT247A', 'GOMATHI K'],
       ['L27+L28', 'TT247A', 'PONNAMBALAM P'],
       ['L33+L34', 'TT247A', 'MARIMUTHU R'],
       ['L43+L44', 'TT247A', 'JAKEER HUSSAIN'],
-      ['L19+L20', 'TT247A', 'GOMATHI K'],
       ['L11+L12', 'TT247A', 'SELVAKUMAR K'],
+      ['L31+L32', 'TT247A', 'GOMATHI K'],
       ['L57+L58', 'TT247A', 'GOPINATH M']] },
   { id: 'BEEE401E', cat: 'DE', kind: 'ETH', name: 'Power Systems Protection and Switchgear', codes: ['BEEE401E'],
-    theory: [['G2', 'TT434A', 'MAGESHVARAN R']],
-    labs: [['L3+L4', 'TT037', 'MAGESHVARAN R']] },
+    theory: [
+      ['G2', 'TT434A', 'MAGESHVARAN R']],
+    labs: [
+      ['L3+L4', 'TT037', 'MAGESHVARAN R']] },
   { id: 'BEEE405L', cat: 'DE', kind: 'TH', name: 'Renewable Energy Systems', codes: ['BEEE405L'],
-    theory: [['E2+TE2', 'TT523', 'VIJAYA PRIYA P']], labs: [] },
+    theory: [
+      ['E2+TE2', 'TT523', 'VIJAYA PRIYA P']],
+    labs: [] },
   { id: 'BEEE409L', cat: 'DE', kind: 'TH', name: 'Robotics and Control', codes: ['BEEE409L'],
-    theory: [['G1+TG1', 'TT434A', 'RASHMI RANJAN DAS']], labs: [] },
+    theory: [
+      ['G1+TG1', 'TT434A', 'RASHMI RANJAN DAS']],
+    labs: [] },
   { id: 'BEEE410L', cat: 'DE', kind: 'TH', name: 'Machine Learning', codes: ['BEEE410L'],
-    theory: [['G1+TG1', 'TT201', 'MONICA SUBASHINI M']], labs: [] },
+    theory: [
+      ['G1+TG1', 'TT201', 'MONICA SUBASHINI M']],
+    labs: [] },
   { id: 'BEEE411L', cat: 'DE', kind: 'TH', name: 'Artificial Intelligence', codes: ['BEEE411L'],
-    theory: [['G1+TG1', 'TT504', 'MAHALAKSHMI P']], labs: [] },
+    theory: [
+      ['G1+TG1', 'TT504', 'MAHALAKSHMI P']],
+    labs: [] },
+  { id: 'BEEE416L', cat: 'DE', kind: 'TH', name: 'Electric Vehicles', codes: ['BEEE416L'],
+    theory: [
+      ['E1+TE1', 'TT523', 'CHITRA A']],
+    labs: [] },
   { id: 'BEEE422L', cat: 'DE', kind: 'TH', name: 'Deep Learning', codes: ['BEEE422L'],
-    theory: [['G2+TG2', 'TT414', 'RAGHUNATHAN T']], labs: [] },
+    theory: [
+      ['G2+TG2', 'TT414', 'RAGHUNATHAN T']],
+    labs: [] },
 
   { id: 'BSTS302P', cat: 'OE', kind: 'SS', name: 'Advanced Competitive Coding - II', codes: ['BSTS302P'],
     theory: [
@@ -708,8 +886,12 @@ const COURSES = RAW.map(c => {
         return { key: t.key, fac: t.fac, theory: t, labs: ls, half: t.half, noLab: labs.length > 0 && !ls.length };
       })
     : labs.map(l => ({ key: l.key, fac: l.fac, theory: null, labs: [l], half: l.half, noLab: false }));
-  const classes = theory.length ? theory[0].occ.length : 0;
-  const credits = (c.kind === 'SS' ? classes / 2 : classes) + (labs.length ? 1 : 0);
+  // credits: one per theory class (half for skills courses) plus one per 1h 40m lab block
+  sections.forEach(s => {
+    const th = s.theory ? (c.kind === 'SS' ? s.theory.occ.length / 2 : s.theory.occ.length) : 0;
+    s.credits = th + (s.labs.length ? slotParts(s.labs[0].slot).length : 0);
+  });
+  const credits = (sections.find(s => !s.noLab) || sections[0]).credits;
   return Object.assign({}, c, { theory, labs, sections, credits, secByKey: Object.fromEntries(sections.map(s => [s.key, s])) });
 });
 const COURSE = Object.fromEntries(COURSES.map(c => [c.id, c]));
@@ -859,7 +1041,7 @@ function entryOptions(entry) {
   const c = COURSE[entry.id];
   const s = c.secByKey[entry.sec];
   if (!s) return [];
-  if (!c.labs.length) return [{ entry, course: c, sec: s, lab: null, occ: s.theory.occ }];
+  if (!c.labs.length || s.noLab) return [{ entry, course: c, sec: s, lab: null, occ: s.theory.occ }];
   const labsOff = new Set(entry.labsOff);
   return s.labs.filter(l => !labsOff.has(l.key))
     .map(l => ({ entry, course: c, sec: s, lab: l, occ: s.theory ? s.theory.occ.concat(l.occ) : l.occ }));
@@ -875,10 +1057,10 @@ function metrics(p) {
   const first = Array(5).fill(99), last = Array(5).fill(-1), facs = [];
   p.forEach(o => {
     if (!o) return;
-    credits += o.course.credits;
+    credits += o.sec.credits;
     facs.push(o.sec.fac.toLowerCase());
     if (o.sec.theory) { th += o.sec.theory.occ.length; if (o.sec.theory.half === 'm') m = true; else e = true; }
-    if (o.lab) labs++;
+    if (o.lab) labs += slotParts(o.lab.slot).length;
     o.occ.forEach(([d, s, en]) => { first[d] = Math.min(first[d], s); last[d] = Math.max(last[d], en); });
   });
   let campus = 0, eight = 0;
@@ -936,7 +1118,7 @@ function feasible(entries) {
   })(0);
 }
 
-const optSlotNames = o => (o.sec.theory ? slotParts(o.sec.theory.slot) : []).concat(o.lab ? [o.lab.slot] : []);
+const optSlotNames = o => (o.sec.theory ? slotParts(o.sec.theory.slot) : []).concat(o.lab ? slotParts(o.lab.slot) : []);
 const andList = a => a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
 
 // Plain-text reason why `entry` can't join `others`, or null when it fits.
@@ -1109,10 +1291,10 @@ function labsHTML(c, s, sel) {
   if (!s.theory || !c.labs.length) return '';
   const d = state.draft;
   let h = '<div class="opt-labs"><span class="lbl">Lab</span>';
-  if (s.noLab) return h + '<span class="warn">No lab listed for this faculty</span></div>';
+  if (s.noLab) return h + '<span class="warn">No lab listed for this faculty, so only the theory is scheduled</span></div>';
   h += s.labs.map(l => {
     const lo = sel && d.labsOff.has(l.key);
-    const inner = l.slot + '<small>' + DAYS[l.occ[0][0]] + ' ' + fmtShort(l.occ[0][1]) + '</small>';
+    const inner = l.slot + '<small>' + l.occ.map(o => DAYS[o[0]] + ' ' + fmtShort(o[1])).join(' · ') + '</small>';
     const title = esc(l.slot + ' · ' + whenLong(l.slot) + ' · ' + l.venue);
     return sel && s.labs.length > 1
       ? '<button type="button" class="lab-chip' + (lo ? ' off' : '') + '" data-lab="' + esc(l.key) + '" aria-pressed="' + !lo + '" title="' + title + (lo ? ' (left out)' : '') + '">' + inner + '</button>'
@@ -1146,7 +1328,7 @@ function renderEditor() {
       if (!msg) fitN++;
       const id = 'opt-' + c.id + '-' + idx;
       const main = s.theory || s.labs[0];
-      const when = s.theory ? whenShort(s.theory.slot) : DAYS[main.occ[0][0]] + ' ' + fmtRange(main.occ[0][1], main.occ[0][2]);
+      const when = s.theory ? whenShort(s.theory.slot) : main.occ.map(o => DAYS[o[0]] + ' ' + fmtRange(o[1], o[2])).join(' · ');
       const fit = others.length ? '<span class="fit ' + (msg ? 'bad' : 'ok') + '">' + (msg ? 'Slot clash' : 'Fits') + '</span>' : '';
       return '<div class="opt' + (sel ? ' sel' : '') + (msg ? ' bad' : '') + '">' +
         '<label class="opt-top" for="' + id + '"><input type="radio" class="radio" name="sec-' + c.id + '" id="' + id + '" value="' + idx + '"' + (sel ? ' checked' : '') + '>' +
@@ -1226,7 +1408,7 @@ function renderMine() {
         '<div class="mine-body"><div class="mine-codes">' + c.codes.join(' + ') + '</div><div class="mine-name">' + esc(c.name) + '</div>' +
           '<div class="mine-sub"><span>' + esc(sec.fac) + '</span><span class="slot-chip ' + (sec.theory ? sec.theory.half : 'lab') + '">' + main.slot + '</span>' +
             (labs.length ? '<span>Lab ' + labs.join(' or ') + '</span>' : '') + '</div></div>' +
-        '<span class="mine-cred">' + credNum(c.credits) + ' cr</span>' +
+        '<span class="mine-cred">' + credNum(sec.credits) + ' cr</span>' +
         '<div class="mine-actions">' +
           '<button type="button" class="icon-btn" data-act="edit" aria-label="Edit ' + esc(c.name) + '">' + ic('edit') + '</button>' +
           '<button type="button" class="icon-btn" data-act="up" aria-label="Move up"' + (i === 0 ? ' disabled' : '') + '>' + ic('up') + '</button>' +
@@ -1239,7 +1421,7 @@ function renderMine() {
 }
 
 function renderMineFoot() {
-  const total = state.mine.reduce((a, e) => a + COURSE[e.id].credits, 0);
+  const total = state.mine.reduce((a, e) => a + COURSE[e.id].secByKey[e.sec].credits, 0);
   $('#total').innerHTML = credNum(total) + ' credits<small>' + state.mine.length + (state.mine.length === 1 ? ' course' : ' courses') + '</small>';
   const n = state.results.length;
   $('#see-results').innerHTML = (n ? 'See ' + n + (state.truncated ? '+' : '') + (n === 1 ? ' timetable' : ' timetables') : 'See timetables') + ic('down2');
@@ -1292,7 +1474,7 @@ function renderResults() {
     if (!o) return;
     const col = 'var(--c' + (o.entry.color + 1) + ')';
     if (o.sec.theory) slotParts(o.sec.theory.slot).forEach(nm => map.set(nm, { col, code: o.course.codes[0], o }));
-    if (o.lab) map.set(o.lab.slot, { col, code: o.course.codes[1] || o.course.codes[0], o });
+    if (o.lab) slotParts(o.lab.slot).forEach(nm => map.set(nm, { col, code: o.course.codes[1] || o.course.codes[0], o }));
   });
   const grid = buildGrid({
     interactive: false,
@@ -1312,7 +1494,7 @@ function renderResults() {
   const stats = [
     '<span class="stat"><b>' + credNum(m.credits) + '</b> credits</span>',
     '<span class="stat ' + (m.mode === 'morning' ? 'm' : m.mode === 'evening' ? 'e' : '') + '">' + modeTxt + '</span>',
-    '<span class="stat"><b>' + m.th + '</b> classes + <b>' + m.labs + '</b> ' + (m.labs === 1 ? 'lab' : 'labs') + ' a week</span>',
+    '<span class="stat"><b>' + m.th + '</b> ' + (m.th === 1 ? 'class' : 'classes') + ' + <b>' + m.labs + '</b> ' + (m.labs === 1 ? 'lab' : 'labs') + ' a week</span>',
     '<span class="stat ' + (m.eight ? 'warnish' : 'good') + (state.filt.sort === 'eight' ? ' sorted' : '') + '">' + (m.eight ? '<b>' + m.eight + '</b> ' + (m.eight === 1 ? 'day starts' : 'days start') + ' at 8 AM' : 'No 8 AM starts') + '</span>',
     '<span class="stat' + (state.filt.sort === 'campus' ? ' sorted' : '') + '"><b>' + hrs + 'h' + (mins ? ' ' + mins + 'm' : '') + '</b> on campus a week</span>'
   ];

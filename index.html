@@ -264,6 +264,8 @@ button.lab-chip:hover{background:var(--mint)}
 .stat.m{background:var(--sun-soft);border-color:color-mix(in srgb,var(--sun) 80%,var(--ink) 10%)}
 .stat.e{background:var(--grape-soft);border-color:color-mix(in srgb,var(--grape) 45%,transparent)}
 .stat.warnish{background:var(--berry-soft);border-color:color-mix(in srgb,var(--berry) 50%,transparent)}
+.stat.sorted{border:2px solid var(--ink);font-weight:600}
+.sort-note{flex:1 1 260px;min-width:0;font-size:.82rem;color:var(--ink-2)}
 .legend{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .legend li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;padding:10px 12px;border-radius:12px 9px 12px 10px;background:color-mix(in srgb,var(--c) 26%,var(--sheet));border:1.5px solid color-mix(in srgb,var(--c) 70%,var(--ink) 25%)}
 .legend .sw{margin-top:3px}
@@ -479,6 +481,7 @@ button.cell:hover{border-color:var(--ink);color:var(--ink)}
             <option value="campus">Least time on campus</option>
           </select>
         </div>
+        <p class="sort-note" id="sort-note" aria-live="polite"></p>
       </div>
       <div id="results"></div>
     </div>
@@ -636,8 +639,9 @@ const RAW = [
       ['L49+L50', 'TT044', 'GOPINATH M'],
       ['L39+L40', 'TT044', 'POOMPAVAI T'],
       ['L37+L38', 'TT044', 'GOPINATH M']] },
-  { id: 'BEEE312P', cat: 'DC', kind: 'LO', name: 'AC Machines Lab', codes: ['BEEE312P'],
-    theory: [],
+  // id kept from when only the lab was listed, so saved lists still find it
+  { id: 'BEEE312P', cat: 'DC', kind: 'TH', name: 'AC Machines', codes: ['BEEE312L', 'BEEE312P'], labTitle: 'AC Machines Lab',
+    theory: [['E1', '', 'ANBARASAN P']],
     labs: [['L31+L32', 'TT035', 'ANBARASAN P']] },
   { id: 'BEEE303', cat: 'DC', kind: 'TH', name: 'Control Systems', codes: ['BEEE303L', 'BEEE303P'], labTitle: 'Control Systems Lab',
     theory: [['G1+TG1', 'TT104', 'JANAKI M']],
@@ -1245,7 +1249,28 @@ function renderMineFoot() {
 /* ======================================================================
    Planner: step 4 (results)
    ====================================================================== */
+const hm = min => Math.floor(min / 60) + 'h' + (min % 60 ? ' ' + (min % 60) + 'm' : '');
+const daysAt8 = n => n + (n === 1 ? ' day' : ' days');
+
+// Says what the current sort did, including when every timetable ties.
+function sortNote() {
+  const v = state.vis, n = v.length, s = state.filt.sort;
+  if (n < 2) return n ? 'Only one timetable fits, so there is nothing to sort.' : '';
+  if (s === 'priority') return 'Listed in your course order. Sort by 8 AM starts or time on campus to put the best one first.';
+  if (s === 'eight') {
+    const lo = v[0].m.eight, hi = v[n - 1].m.eight;
+    if (lo === hi) return lo
+      ? 'All ' + n + ' timetables start at 8 AM on ' + daysAt8(lo) + ', so this sort can\'t change the order.'
+      : 'None of the ' + n + ' timetables has an 8 AM start, so this sort can\'t change the order.';
+    return 'Best first: ' + (lo ? daysAt8(lo) : 'no days') + ' at 8 AM, up to ' + daysAt8(hi) + ' for the last one.';
+  }
+  const lo = v[0].m.campus, hi = v[n - 1].m.campus;
+  if (lo === hi) return 'All ' + n + ' timetables keep you on campus ' + hm(lo) + ' a week, so this sort can\'t change the order.';
+  return 'Best first: ' + hm(lo) + ' on campus a week, up to ' + hm(hi) + ' for the last one.';
+}
+
 function renderResults() {
+  $('#sort-note').textContent = sortNote();
   const box = $('#results');
   const total = state.results.length;
   $('#res-count').textContent = total ? total + (state.truncated ? '+' : '') + (total === 1 ? ' timetable' : ' timetables') : '';
@@ -1288,8 +1313,8 @@ function renderResults() {
     '<span class="stat"><b>' + credNum(m.credits) + '</b> credits</span>',
     '<span class="stat ' + (m.mode === 'morning' ? 'm' : m.mode === 'evening' ? 'e' : '') + '">' + modeTxt + '</span>',
     '<span class="stat"><b>' + m.th + '</b> classes + <b>' + m.labs + '</b> ' + (m.labs === 1 ? 'lab' : 'labs') + ' a week</span>',
-    '<span class="stat ' + (m.eight ? 'warnish' : 'good') + '">' + (m.eight ? '<b>' + m.eight + '</b> ' + (m.eight === 1 ? 'day starts' : 'days start') + ' at 8 AM' : 'No 8 AM starts') + '</span>',
-    '<span class="stat"><b>' + hrs + 'h' + (mins ? ' ' + mins + 'm' : '') + '</b> on campus a week</span>'
+    '<span class="stat ' + (m.eight ? 'warnish' : 'good') + (state.filt.sort === 'eight' ? ' sorted' : '') + '">' + (m.eight ? '<b>' + m.eight + '</b> ' + (m.eight === 1 ? 'day starts' : 'days start') + ' at 8 AM' : 'No 8 AM starts') + '</span>',
+    '<span class="stat' + (state.filt.sort === 'campus' ? ' sorted' : '') + '"><b>' + hrs + 'h' + (mins ? ' ' + mins + 'm' : '') + '</b> on campus a week</span>'
   ];
   if (m.free.length) stats.push('<span class="stat good">Free ' + m.free.map(d => DAY_FULL[d]).join(' &amp; ') + '</span>');
 
@@ -1573,7 +1598,14 @@ $('#remove-all').addEventListener('click', e => {
 });
 
 // step 4
-$('#sort').addEventListener('change', e => { state.filt.sort = e.target.value; state.page = 0; save(); applyFilters(); renderResults(); });
+$('#sort').addEventListener('change', e => {
+  state.filt.sort = e.target.value;
+  state.page = 0;
+  save();
+  applyFilters();
+  renderResults();
+  if (state.vis.length) toast(sortNote());
+});
 $('#results').addEventListener('click', e => {
   const pg = e.target.closest('[data-pg]');
   if (pg && !pg.disabled) {

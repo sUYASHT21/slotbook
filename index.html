@@ -77,6 +77,11 @@ button,input,select{font:inherit;color:inherit}
 .logo-line{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round}
 .brand-name{display:block;font-family:var(--font-hand);font-weight:700;font-size:2.1rem;line-height:.9}
 .brand-sub{display:block;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.branch{display:flex;align-items:center;gap:5px;margin-left:auto;padding:5px 6px 5px 14px;border:2px solid var(--ink);border-radius:16px 10px 16px 12px;background:var(--sheet);box-shadow:0 3px 0 var(--ink)}
+.branch-lbl{font-family:var(--font-hand);font-weight:700;font-size:1.4rem;line-height:1;margin-right:4px}
+.branch button{border:0;background:transparent;padding:.42em 1em;border-radius:12px 8px 12px 9px;font-weight:700;font-size:1rem;letter-spacing:.05em;cursor:pointer}
+.branch button:hover{background:var(--rule-2)}
+.branch button[aria-pressed="true"]{background:var(--mint);box-shadow:inset 0 0 0 2px var(--ink)}
 .stamp{color:var(--berry-ink);border:2px dashed var(--berry);border-radius:12px 8px 12px 9px;padding:.3em .85em .35em;transform:rotate(4deg);text-align:center;line-height:1.1;background:color-mix(in srgb,var(--berry-soft) 55%,transparent)}
 .stamp span{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600}
 .stamp b{display:block;font-family:var(--font-hand);font-size:1.55rem;font-weight:700}
@@ -377,6 +382,8 @@ button.cell:hover{border-color:var(--ink);color:var(--ink)}
   .swipe{display:block}
 }
 @media (max-width:680px){
+  .top{flex-wrap:wrap}
+  .branch{order:3;margin-left:0;width:100%;justify-content:center}
   .hero{grid-template-columns:1fr;padding-block:14px 26px}
   .cheat{justify-self:center;transform:rotate(1.5deg)}
   .star{display:none}
@@ -405,6 +412,11 @@ button.cell:hover{border-color:var(--ink);color:var(--ink)}
     </svg>
     <span><span class="brand-name">Slotbook</span><span class="brand-sub">FFCS timetable planner</span></span>
   </a>
+  <div class="branch" id="branch" role="group" aria-label="Your branch">
+    <span class="branch-lbl">Branch</span>
+    <button type="button" data-branch="EEE" aria-pressed="true">EEE</button>
+    <button type="button" data-branch="ECS" aria-pressed="false">ECS</button>
+  </div>
   <div class="stamp"><span>Winter semester</span><b>2026–27</b></div>
 </header>
 
@@ -439,7 +451,7 @@ button.cell:hover{border-color:var(--ink);color:var(--ink)}
     <div class="planner-top">
       <div class="sheet picker">
         <span class="tape" style="--tape:var(--sky)"></span>
-        <div class="card-head"><h2 class="card-title"><span class="step">1</span>Pick a course</h2></div>
+        <div class="card-head"><h2 class="card-title"><span class="step">1</span>Pick a course</h2><span class="note" id="branch-note"></span></div>
         <div class="seg" id="cats" role="group" aria-label="Course category"></div>
         <input class="field" id="course-search" type="search" placeholder="Search by name, code or faculty" autocomplete="off" aria-label="Search courses">
         <ul class="clist" id="course-list"></ul>
@@ -517,7 +529,7 @@ button.cell:hover{border-color:var(--ink);color:var(--ink)}
   <footer class="foot">
     <div class="foot-note">
       <span class="hand">Heads up!</span>
-      <p>Only <b>EEE</b> courses have been added so far. Want your branch's courses? DM your branch name on Instagram to <a href="https://www.instagram.com/suyash21jain/" target="_blank" rel="noopener">@suyash21jain</a> and they'll be added.</p>
+      <p>Only <b>EEE</b> and <b>ECS</b> courses have been added so far. Want your branch's courses? DM your branch name on Instagram to <a href="https://www.instagram.com/suyash21jain/" target="_blank" rel="noopener">@suyash21jain</a> and they'll be added.</p>
     </div>
     <div class="foot-meta">
       <span class="hand">Made for VIT FFCS, Winter 2026–27</span>
@@ -599,7 +611,7 @@ const whenLong = str => slotOcc(str).map(([d, s, e]) => DAY_FULL[d] + ' ' + fmtR
    kind: TH theory (lab may be a separate P code), ETH embedded theory+lab,
          LO lab only, SS soft skill
    rows: [slot, venue, faculty]
-   FC, DC and DE are generated from the VTOP allocation export; OE is kept by hand.
+   Each branch's FC, DC and DE come from its VTOP allocation export; OE is shared and kept by hand.
    ====================================================================== */
 const CATS = [
   { id: 'FC', name: 'Foundation Core' },
@@ -607,7 +619,7 @@ const CATS = [
   { id: 'DE', name: 'Discipline Elective' },
   { id: 'OE', name: 'Open Elective' }
 ];
-const RAW = [
+const RAW_EEE = [
   { id: 'BARB101L', cat: 'FC', kind: 'TH', name: 'Arabic', codes: ['BARB101L'],
     theory: [
       ['B2', 'PRP230', 'MOHD SAQIB'],
@@ -861,8 +873,300 @@ const RAW = [
   { id: 'BEEE422L', cat: 'DE', kind: 'TH', name: 'Deep Learning', codes: ['BEEE422L'],
     theory: [
       ['G2+TG2', 'TT414', 'RAGHUNATHAN T']],
+    labs: [] }
+];
+
+const RAW_ECS = [
+  { id: 'BARB101L', cat: 'FC', kind: 'TH', name: 'Arabic', codes: ['BARB101L'],
+    theory: [
+      ['C1', 'PRP230', 'MOHD SAQIB'],
+      ['B2', 'PRP230', 'MOHD SAQIB']],
+    labs: [] },
+  { id: 'BCHI101L', cat: 'FC', kind: 'TH', name: 'Chinese I', codes: ['BCHI101L'],
+    theory: [
+      ['G1', 'PRP104', 'KHANA BAIDYA'],
+      ['F2', 'SJT105', 'KHANA BAIDYA']],
+    labs: [] },
+  { id: 'BCHY101', cat: 'FC', kind: 'TH', name: 'Engineering Chemistry', codes: ['BCHY101L', 'BCHY101P'], labTitle: 'Engineering Chemistry Lab',
+    theory: [
+      ['G1+TG1', 'PRP434', 'ATANU CHAKRABORTY'],
+      ['G2+TG2', 'PRP630', 'SATHISH KUMAR P']],
+    labs: [
+      ['L15+L16', 'PRP408A', 'ASHINA CHANDRAN'],
+      ['L15+L16', 'PRP408A', 'SATHISH KUMAR P'],
+      ['L45+L46', 'PRP408A', 'ATANU CHAKRABORTY'],
+      ['L45+L46', 'PRP408A', 'ASHINA CHANDRAN']] },
+  { id: 'BCLE212L', cat: 'FC', kind: 'TH', name: 'Natural Disaster Mitigation and Management', codes: ['BCLE212L'],
+    theory: [
+      ['G1+TG1', 'CDMM404', 'SUGANYA OM'],
+      ['G1+TG1', 'CDMM104', 'MEENA T']],
+    labs: [] },
+  { id: 'BCLE214L', cat: 'FC', kind: 'TH', name: 'Global Warming', codes: ['BCLE214L'],
+    theory: [
+      ['F2+TF2', 'CDMM105', 'KAVITHA M.S'],
+      ['G1+TG1', 'CDMM403', 'VIGNESH RAJKUMAR L']],
+    labs: [] },
+  { id: 'BCLE216L', cat: 'FC', kind: 'TH', name: 'Water Resource Management', codes: ['BCLE216L'],
+    theory: [
+      ['D1+TD1', 'CDMM105', 'PARIMALA RENGANAYAKI S'],
+      ['D1+TD1', 'CDMM104', 'VIGNESH RAJKUMAR L'],
+      ['G2+TG2', 'CDMM107', 'MAHENTHIRAN S']],
+    labs: [] },
+  { id: 'BCSE101E', cat: 'FC', kind: 'ETH', name: 'Computer Programming: Python', codes: ['BCSE101E'],
+    theory: [
+      ['TCC1', 'SJT301', 'KAVITHA G']],
+    labs: [
+      ['L31+L32+L41+L42', 'SJT318', 'KAVITHA G']] },
+  { id: 'BCSE103E', cat: 'FC', kind: 'ETH', name: 'Computer Programming: Java', codes: ['BCSE103E'],
+    theory: [
+      ['TAA2', 'SJT304', 'UMA PRIYA D'],
+      ['TAA1', 'PRP125', 'MOHAMED YOUSUFF A R']],
+    labs: [
+      ['L5+L6+L19+L20', 'SJT416', 'UMA PRIYA D'],
+      ['L35+L36+L51+L52', 'PRP234', 'MOHAMED YOUSUFF A R']] },
+  { id: 'BEEE102', cat: 'FC', kind: 'TH', name: 'Basic Electrical and Electronics Engineering', codes: ['BEEE102L', 'BEEE102P'], labTitle: 'Basic Electrical and Electronics Engineering Lab',
+    theory: [
+      ['E1+TE1', 'TT404', 'BELWIN EDWARD J'],
+      ['E2+TE2', 'TT404', 'MEIKANDASIVAM S']],
+    labs: [
+      ['L31+L32', 'TT344', 'BELWIN EDWARD J'],
+      ['L51+L52', 'TT344', 'BELWIN EDWARD J'],
+      ['L23+L24', 'TT344', 'MEIKANDASIVAM S'],
+      ['L21+L22', 'TT344', 'MEIKANDASIVAM S']] },
+  { id: 'BENG101', cat: 'FC', kind: 'TH', name: 'Technical English Communication', codes: ['BENG101L', 'BENG101P'], labTitle: 'Technical English Communication Lab',
+    theory: [
+      ['C2', 'SJT409', 'DENISH RAJA DURAI K']],
+    labs: [
+      ['L23+L24', 'PRP249', 'DENISH RAJA DURAI K']] },
+  { id: 'BENG102P', cat: 'FC', kind: 'LO', name: 'Technical Report Writing', codes: ['BENG102P'],
+    theory: [],
+    labs: [
+      ['L23+L24', 'TT432', 'ANBURAJ G']] },
+  { id: 'BESP101L', cat: 'FC', kind: 'TH', name: 'Spanish I', codes: ['BESP101L'],
+    theory: [
+      ['B1', 'SJT409', 'SHILPI GUPTA'],
+      ['F2', 'SJT222', 'NUPUR MANASI'],
+      ['B1', 'SJT201', 'BAISHALI CHOUDHURI'],
+      ['F1', 'SJT126', 'NUPUR MANASI'],
+      ['B1', 'SMV123', 'SABYASACHI MISHRA']],
+    labs: [] },
+  { id: 'BFRE101L', cat: 'FC', kind: 'TH', name: 'French I', codes: ['BFRE101L'],
+    theory: [
+      ['F1', 'PRP429', 'SHANTANU SHANDILYA'],
+      ['B2', 'PRP223', 'SHANTANU SHANDILYA'],
+      ['E2', 'SMV130', 'MALATHY O'],
+      ['E1', 'TT104', 'COUMARAN G'],
+      ['F1', 'SMV101', 'COUMARAN G']],
+    labs: [] },
+  { id: 'BGER101L', cat: 'FC', kind: 'TH', name: 'German I', codes: ['BGER101L'],
+    theory: [
+      ['G2', 'SJT415', 'DHANANJAY KUMAR'],
+      ['A2', 'SJT315', 'ABHIJIT KR DARBEY'],
+      ['F1', 'SJT709', 'AMIT KUMAR SAINI'],
+      ['F1', 'SJT303', 'DHANANJAY KUMAR'],
+      ['A2', 'SJT127', 'ARATI KUMARI'],
+      ['B2', 'SJT202', 'ARATI KUMARI'],
+      ['F1', 'SJT302', 'ABHIJIT KR DARBEY']],
+    labs: [] },
+  { id: 'BHUM108L', cat: 'FC', kind: 'TH', name: 'Urban Community Development', codes: ['BHUM108L'],
+    theory: [
+      ['B2+TB2', 'SJT409', 'BALAMURUGAN J']],
+    labs: [] },
+  { id: 'BJAP101L', cat: 'FC', kind: 'TH', name: 'Japanese I', codes: ['BJAP101L'],
+    theory: [
+      ['A2', 'SJT405', 'KHANJAN'],
+      ['C2', 'SMV214', 'HIYA MUKHERJEE']],
+    labs: [] },
+  { id: 'BMAT101', cat: 'FC', kind: 'TH', name: 'Calculus', codes: ['BMAT101L', 'BMAT101P'], labTitle: 'Calculus Lab',
+    theory: [
+      ['D2+TD2', 'SJT223', 'GORINTLA SUCHARITHA']],
+    labs: [
+      ['L3+L4', 'PRP447', 'GORINTLA SUCHARITHA']] },
+  { id: 'BMAT102L', cat: 'FC', kind: 'TH', name: 'Differential Equations and Transforms', codes: ['BMAT102L'],
+    theory: [
+      ['B2+TB2+TBB2', 'SJT407', 'AKELLA VENKATA SURYANARAYANA MURTY'],
+      ['C1+TC1+TCC1', 'SJT617', 'INDHIRA K']],
+    labs: [] },
+  { id: 'BMAT201L', cat: 'FC', kind: 'TH', name: 'Complex Variables and Linear Algebra', codes: ['BMAT201L'],
+    theory: [
+      ['C2+TC2+TCC2', 'SJT405', 'VIJAYA K'],
+      ['C1+TC1+TCC1', 'SJT415', 'MURUGUSUNDARAMOORTHY G']],
+    labs: [] },
+  { id: 'BMAT202', cat: 'FC', kind: 'TH', name: 'Probability and Statistics', codes: ['BMAT202L', 'BMAT202P'], labTitle: 'Probability and Statistics Lab',
+    theory: [
+      ['G2+TG2', 'TT523', 'INDHIRA K'],
+      ['G1+TG1', 'SMV123', 'DINESH KUMAR S']],
+    labs: [
+      ['L5+L6', 'SJT620', 'INDHIRA K'],
+      ['L55+L56', 'PRP119', 'DINESH KUMAR S']] },
+  { id: 'BMGT101L', cat: 'FC', kind: 'TH', name: 'Principles of Management', codes: ['BMGT101L'],
+    theory: [
+      ['C1+TC1', 'MB229', 'NATARAJ G']],
+    labs: [] },
+  { id: 'BPHY101', cat: 'FC', kind: 'TH', name: 'Engineering Physics', codes: ['BPHY101L', 'BPHY101P'], labTitle: 'Engineering Physics Lab',
+    theory: [
+      ['B2+TB2', 'TT413', 'RAJAN BABU D']],
+    labs: [
+      ['L23+L24', 'TT420', 'RAJAN BABU D']] },
+  { id: 'BSTS101P', cat: 'FC', kind: 'SS', name: 'Quantitative Skills Practice I', codes: ['BSTS101P'],
+    theory: [
+      ['D2+TD2', 'TT415', 'ETHNUS (APT)']],
+    labs: [] },
+  { id: 'BSTS102P', cat: 'FC', kind: 'SS', name: 'Quantitative Skills Practice II', codes: ['BSTS102P'],
+    theory: [
+      ['D1+TD1', 'SJT101', 'ETHNUS (APT)']],
+    labs: [] },
+  { id: 'BSTS201P', cat: 'FC', kind: 'SS', name: 'Qualitative Skills Practice I', codes: ['BSTS201P'],
+    theory: [
+      ['D2+TD2', 'TT414', 'FACE (APT)']],
+    labs: [] },
+  { id: 'BSTS202P', cat: 'FC', kind: 'SS', name: 'Qualitative Skills Practice II', codes: ['BSTS202P'],
+    theory: [
+      ['D1+TD1', 'SJT222', 'FACE (APT)']],
     labs: [] },
 
+  { id: 'BCSE202', cat: 'DC', kind: 'TH', name: 'Data Structures and Algorithms', codes: ['BCSE202L', 'BCSE202P'], labTitle: 'Data Structures and Algorithms Lab',
+    theory: [
+      ['B2+TB2', 'SJT311', 'SATYAJIT DAS'],
+      ['B1+TB1', 'SJT311', 'SATYAJIT DAS']],
+    labs: [
+      ['L55+L56', 'SJT317', 'SATYAJIT DAS'],
+      ['L15+L16', 'SJT317', 'SATYAJIT DAS']] },
+  { id: 'BCSE205L', cat: 'DC', kind: 'TH', name: 'Computer Architecture and Organization', codes: ['BCSE205L'],
+    theory: [
+      ['E1+TE1', 'SJT311', 'DHIVYAA C R'],
+      ['E2+TE2', 'SJT311', 'PRIYADHARSINI M'],
+      ['E1+TE1', 'TT413', 'ABHISHEK G']],
+    labs: [] },
+  { id: 'BCSE302', cat: 'DC', kind: 'TH', name: 'Database Systems', codes: ['BCSE302L', 'BCSE302P'], labTitle: 'Database Systems Lab',
+    theory: [
+      ['F2+TF2', 'SJT311', 'DEEPIKA J'],
+      ['F1+TF1', 'SJT311', 'DEEPIKA J']],
+    labs: [
+      ['L55+L56', 'SJT417', 'DEEPIKA J'],
+      ['L11+L12', 'SJT317', 'DEEPIKA J']] },
+  { id: 'BCSE303', cat: 'DC', kind: 'TH', name: 'Operating Systems', codes: ['BCSE303L', 'BCSE303P'], labTitle: 'Operating Systems Lab',
+    theory: [
+      ['G1+TG1', 'SJT421', 'KARTHIK G M'],
+      ['G2+TG2', 'SJT311', 'KARTHIK G M']],
+    labs: [
+      ['L47+L48', 'SJT318', 'KARTHIK G M'],
+      ['L27+L28', 'SJT417', 'KARTHIK G M']] },
+  { id: 'BCSE308', cat: 'DC', kind: 'TH', name: 'Computer Networks', codes: ['BCSE308L', 'BCSE308P'], labTitle: 'Computer Networks Lab',
+    theory: [
+      ['C1+TC1', 'SJT311A', 'KATARI BALAKRISHNA'],
+      ['C2+TC2', 'SJT302', 'KALPANA V']],
+    labs: [
+      ['L45+L46', 'SJT417', 'KATARI BALAKRISHNA'],
+      ['L11+L12', 'SJT316', 'KALPANA V']] },
+  { id: 'BECS301L', cat: 'DC', kind: 'TH', name: 'Electrical Machines', codes: ['BECS301L'],
+    theory: [
+      ['G1+TG1', 'TT415', 'RAJU J']],
+    labs: [] },
+  { id: 'BECS302L', cat: 'DC', kind: 'TH', name: 'Digital Instrumentation', codes: ['BECS302L'],
+    theory: [
+      ['A1', 'TT434', 'JANESHWARAN G'],
+      ['A2', 'TT434', 'JANESHWARAN G']],
+    labs: [] },
+  { id: 'BECS303', cat: 'DC', kind: 'TH', name: 'Power Electronics and Drives', codes: ['BECS303L', 'BECS303P'], labTitle: 'Power Electronics and Drives Lab',
+    theory: [
+      ['B1+TB1', 'TT434', 'ARUN N'],
+      ['B2+TB2', 'TT434', 'ARUN N']],
+    labs: [
+      ['L57+L58', 'TT044', 'ARUN N'],
+      ['L45+L46', 'TT044', 'ARUN N'],
+      ['L13+L14', 'TT044', 'ARUN N'],
+      ['L23+L24', 'TT044', 'ARUN N']] },
+  { id: 'BECS305E', cat: 'DC', kind: 'ETH', name: 'AI and ML for Electrical Systems', codes: ['BECS305E'],
+    theory: [
+      ['D2', 'TT434', 'SATHISHKUMAR K'],
+      ['D1', 'TT434', 'THIRUNAVUKKARASU M']],
+    labs: [
+      ['L15+L16', 'TT433', 'SATHISHKUMAR K'],
+      ['L29+L30', 'TT433', 'SATHISHKUMAR K'],
+      ['L55+L56', 'TT433', 'THIRUNAVUKKARASU M'],
+      ['L39+L40', 'TT433', 'THIRUNAVUKKARASU M']] },
+  { id: 'BEEE303', cat: 'DC', kind: 'TH', name: 'Control Systems', codes: ['BEEE303L', 'BEEE303P'], labTitle: 'Control Systems Lab',
+    theory: [
+      ['G1+TG1', 'TT104', 'JANAKI M']],
+    labs: [
+      ['L33+L34', 'TT045', 'JANAKI M']] },
+  { id: 'BEEE309', cat: 'DC', kind: 'TH', name: 'Microprocessors and Microcontrollers', codes: ['BEEE309L', 'BEEE309P'], labTitle: 'Microprocessors and Microcontrollers Lab',
+    theory: [
+      ['A2+TA2', 'TT204', 'CHILUKURI VENKATA MAHENDRA'],
+      ['A1+TA1', 'TT434A', 'CHILUKURI VENKATA MAHENDRA'],
+      ['A2+TA2', 'TT434A', 'RAMA PRABHA D'],
+      ['A1+TA1', 'TT204', 'MADDELA CHINNA OBAIAH'],
+      ['A1+TA1', 'TT201', 'BALAMURUGAN M'],
+      ['A2+TA2', 'TT201', 'BALAMURUGAN M']],
+    labs: [
+      ['L33+L34', 'TT515', 'BALAMURUGAN M'],
+      ['L49+L50', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L19+L20', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L29+L30', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L15+L16', 'TT515', 'RAMA PRABHA D'],
+      ['L39+L40', 'TT515', 'CHILUKURI VENKATA MAHENDRA'],
+      ['L43+L44', 'TT515', 'MADDELA CHINNA OBAIAH'],
+      ['L57+L58', 'TT515', 'MADDELA CHINNA OBAIAH'],
+      ['L41+L42', 'TT515', 'BALAMURUGAN M'],
+      ['L9+L10', 'TT515', 'BALAMURUGAN M'],
+      ['L23+L24', 'TT515', 'RAMA PRABHA D'],
+      ['L25+L26', 'TT515', 'BALAMURUGAN M']] },
+
+  { id: 'BCSE204', cat: 'DE', kind: 'TH', name: 'Design and Analysis of Algorithms', codes: ['BCSE204L', 'BCSE204P'], labTitle: 'Design and Analysis of Algorithms Lab',
+    theory: [
+      ['C1+TC1', 'SJT311', 'ERAPANENI GAYATRI'],
+      ['C2+TC2', 'SJT311', 'ERAPANENI GAYATRI']],
+    labs: [
+      ['L1+L2', 'SJT417', 'ERAPANENI GAYATRI'],
+      ['L49+L50', 'SJT317', 'ERAPANENI GAYATRI']] },
+  { id: 'BCSE208', cat: 'DE', kind: 'TH', name: 'Data Mining', codes: ['BCSE208L', 'BCSE208P'], labTitle: 'Data Mining Lab',
+    theory: [
+      ['B1', 'SJT602A', 'ANTONY SEBA P']],
+    labs: [
+      ['L45+L46', 'SJT622', 'ANTONY SEBA P']] },
+  { id: 'BCSE301', cat: 'DE', kind: 'TH', name: 'Software Engineering', codes: ['BCSE301L', 'BCSE301P'], labTitle: 'Software Engineering Lab',
+    theory: [
+      ['G1+TG1', 'TT434', 'THIRUVENKADAM S']],
+    labs: [
+      ['L49+L50', 'TT247A', 'THIRUVENKADAM S']] },
+  { id: 'BCSE304L', cat: 'DE', kind: 'TH', name: 'Theory of Computation', codes: ['BCSE304L'],
+    theory: [
+      ['A2+TA2', 'SJT311', 'SRIDEVI S'],
+      ['A1+TA1', 'SJT311', 'SAURABH AGRAWAL']],
+    labs: [] },
+  { id: 'BCSE307', cat: 'DE', kind: 'TH', name: 'Compiler Design', codes: ['BCSE307L', 'BCSE307P'], labTitle: 'Compiler Design Lab',
+    theory: [
+      ['B1+TB1', 'SJT311A', 'SATHYA K'],
+      ['B2+TB2', 'SJT311A', 'BANUPRIYA R']],
+    labs: [
+      ['L33+L34', 'SJT317', 'SATHYA K'],
+      ['L21+L22', 'SJT317', 'BANUPRIYA R']] },
+  { id: 'BECE320E', cat: 'DE', kind: 'ETH', name: 'Embedded C Programming', codes: ['BECE320E'],
+    theory: [
+      ['C2', 'TT434A', 'PONNAMBALAM P'],
+      ['C1', 'TT434A', 'MARIMUTHU R'],
+      ['C1', 'TT201', 'GOMATHI K'],
+      ['C2', 'TT434', 'GOMATHI K'],
+      ['C2', 'TT201', 'SELVAKUMAR K'],
+      ['C1', 'TT204', 'JAKEER HUSSAIN'],
+      ['C1', 'TT434', 'GOPINATH M']],
+    labs: [
+      ['L33+L34', 'TT247A', 'MARIMUTHU R'],
+      ['L27+L28', 'TT247A', 'PONNAMBALAM P'],
+      ['L31+L32', 'TT247A', 'GOMATHI K'],
+      ['L19+L20', 'TT247A', 'GOMATHI K'],
+      ['L11+L12', 'TT247A', 'SELVAKUMAR K'],
+      ['L43+L44', 'TT247A', 'JAKEER HUSSAIN'],
+      ['L57+L58', 'TT247A', 'GOPINATH M']] },
+  { id: 'BEEE422L', cat: 'DE', kind: 'TH', name: 'Deep Learning', codes: ['BEEE422L'],
+    theory: [
+      ['G2+TG2', 'TT414', 'RAGHUNATHAN T']],
+    labs: [] }
+];
+
+// Open Elective is the same for every branch
+const OPEN_ELECTIVES = [
   { id: 'BSTS302P', cat: 'OE', kind: 'SS', name: 'Advanced Competitive Coding - II', codes: ['BSTS302P'],
     theory: [
       ['F1+TF1', 'Random', 'ETHNUS (APT)'],
@@ -872,30 +1176,41 @@ const RAW = [
     labs: [] }
 ];
 
-const COURSES = RAW.map(c => {
-  const mk = ([slot, venue, fac]) => ({
-    slot, fac, venue: venue || 'Venue TBA', occ: slotOcc(slot),
-    half: SLOTS.get(slotParts(slot)[0]).half,
-    key: slot + '|' + fac + '|' + venue
+const BRANCHES = [
+  { id: 'EEE', raw: RAW_EEE.concat(OPEN_ELECTIVES) },
+  { id: 'ECS', raw: RAW_ECS.concat(OPEN_ELECTIVES) }
+];
+
+function buildCourses(raw) {
+  const list = raw.map(c => {
+    const mk = ([slot, venue, fac]) => ({
+      slot, fac, venue: venue || 'Venue TBA', occ: slotOcc(slot),
+      half: SLOTS.get(slotParts(slot)[0]).half,
+      key: slot + '|' + fac + '|' + venue
+    });
+    const theory = c.theory.map(mk), labs = c.labs.map(mk);
+    // A theory section pairs with labs of the same faculty, on the opposite half of the day.
+    const sections = theory.length
+      ? theory.map(t => {
+          let ls = labs.filter(l => l.fac === t.fac && l.half !== t.half);
+          if (!ls.length) ls = labs.filter(l => l.fac === t.fac);
+          return { key: t.key, fac: t.fac, theory: t, labs: ls, half: t.half, noLab: labs.length > 0 && !ls.length };
+        })
+      : labs.map(l => ({ key: l.key, fac: l.fac, theory: null, labs: [l], half: l.half, noLab: false }));
+    // credits: one per theory class (half for skills courses) plus one per 1h 40m lab block
+    sections.forEach(s => {
+      const th = s.theory ? (c.kind === 'SS' ? s.theory.occ.length / 2 : s.theory.occ.length) : 0;
+      s.credits = th + (s.labs.length ? slotParts(s.labs[0].slot).length : 0);
+    });
+    const credits = (sections.find(s => !s.noLab) || sections[0]).credits;
+    return Object.assign({}, c, { theory, labs, sections, credits, secByKey: Object.fromEntries(sections.map(s => [s.key, s])) });
   });
-  const theory = c.theory.map(mk), labs = c.labs.map(mk);
-  // A theory section pairs with labs of the same faculty, on the opposite half of the day.
-  const sections = theory.length
-    ? theory.map(t => {
-        let ls = labs.filter(l => l.fac === t.fac && l.half !== t.half);
-        if (!ls.length) ls = labs.filter(l => l.fac === t.fac);
-        return { key: t.key, fac: t.fac, theory: t, labs: ls, half: t.half, noLab: labs.length > 0 && !ls.length };
-      })
-    : labs.map(l => ({ key: l.key, fac: l.fac, theory: null, labs: [l], half: l.half, noLab: false }));
-  // credits: one per theory class (half for skills courses) plus one per 1h 40m lab block
-  sections.forEach(s => {
-    const th = s.theory ? (c.kind === 'SS' ? s.theory.occ.length / 2 : s.theory.occ.length) : 0;
-    s.credits = th + (s.labs.length ? slotParts(s.labs[0].slot).length : 0);
-  });
-  const credits = (sections.find(s => !s.noLab) || sections[0]).credits;
-  return Object.assign({}, c, { theory, labs, sections, credits, secByKey: Object.fromEntries(sections.map(s => [s.key, s])) });
-});
-const COURSE = Object.fromEntries(COURSES.map(c => [c.id, c]));
+  return { list, map: Object.fromEntries(list.map(c => [c.id, c])) };
+}
+const DATA = Object.fromEntries(BRANCHES.map(br => [br.id, buildCourses(br.raw)]));
+// the selected branch's courses; switchBranch() points these at another branch
+let COURSES = DATA.EEE.list, COURSE = DATA.EEE.map;
+function useBranch(id) { COURSES = DATA[id].list; COURSE = DATA[id].map; }
 
 const kindLabel = c => c.kind === 'TH' ? (c.labs.length ? 'Theory + Lab' : 'Theory') : { ETH: 'Embedded', LO: 'Lab only', SS: 'Soft skill' }[c.kind];
 const kindCls = c => c.kind === 'TH' ? (c.labs.length ? 'thlab' : 'th') : c.kind.toLowerCase();
@@ -983,10 +1298,36 @@ function normEntry(e, i) {
 }
 
 const state = {
-  view: 'planner', cat: 'DC', q: '', mine: [], draft: null, restorePage: 0,
+  view: 'planner', cat: 'DC', q: '', branch: 'EEE', branchData: {}, mine: [], draft: null, restorePage: 0,
   slotSel: [], svKind: 'th', filt: { sort: 'priority' }, page: 0,
   results: [], vis: [], truncated: false, diag: null, dropped: []
 };
+
+// Loads one branch's saved courses, open course and timetable page into state.
+function loadBranch(saved) {
+  state.mine = []; state.draft = null; state.restorePage = 0; state.dropped = [];
+  if (!saved || typeof saved !== 'object') return;
+  // earlier versions preloaded example courses; a list nobody touched is not the visitor's own
+  if (Array.isArray(saved.mine) && !saved.example) {
+    const seen = new Set();
+    const list = saved.mine.map(normEntry).filter(e => e && !seen.has(e.id) && seen.add(e.id));
+    // keep courses in order, dropping any that clash with the ones above them
+    list.forEach(e => {
+      if (feasible(state.mine.concat([e]))) state.mine.push(e);
+      else state.dropped.push(COURSE[e.id].name);
+    });
+  }
+  if (saved.draft && typeof saved.draft === 'object' && COURSE[saved.draft.id]) {
+    const de = normEntry(saved.draft, 0);
+    state.draft = { id: de.id, sec: de.sec, labsOff: new Set(de.labsOff), isNew: !state.mine.some(m => m.id === de.id) };
+  }
+  if (Number.isInteger(saved.page) && saved.page > 0) state.restorePage = saved.page;
+}
+
+const branchSnapshot = () => ({
+  mine: state.mine, page: state.page,
+  draft: state.draft && { id: state.draft.id, sec: state.draft.sec, labsOff: [...state.draft.labsOff] }
+});
 
 (function restore() {
   let saved = null;
@@ -994,27 +1335,19 @@ const state = {
   if (saved && typeof saved === 'object') {
     if (saved.view === 'slots' || saved.view === 'planner') state.view = saved.view;
     if (CATS.some(c => c.id === saved.cat)) state.cat = saved.cat;
-    // earlier versions preloaded example courses; a list nobody touched is not the visitor's own
-    if (Array.isArray(saved.mine) && !saved.example) {
-      const seen = new Set();
-      const list = saved.mine.map(normEntry).filter(e => e && !seen.has(e.id) && seen.add(e.id));
-      // keep courses in order, dropping any that clash with the ones above them
-      list.forEach(e => {
-        if (feasible(state.mine.concat([e]))) state.mine.push(e);
-        else state.dropped.push(COURSE[e.id].name);
-      });
-    }
-    if (saved.draft && typeof saved.draft === 'object' && COURSE[saved.draft.id]) {
-      const de = normEntry(saved.draft, 0);
-      state.draft = { id: de.id, sec: de.sec, labsOff: new Set(de.labsOff), isNew: !state.mine.some(m => m.id === de.id) };
-    }
-    if (Number.isInteger(saved.page) && saved.page > 0) state.restorePage = saved.page;
+    if (DATA[saved.branch]) state.branch = saved.branch;
+    // saves from before branches existed were all EEE
+    state.branchData = saved.branches && typeof saved.branches === 'object'
+      ? saved.branches
+      : { EEE: { mine: saved.mine, draft: saved.draft, page: saved.page, example: saved.example } };
     if (Array.isArray(saved.slotSel)) state.slotSel = saved.slotSel.filter(n => SLOTS.has(n));
     if (saved.svKind === 'lab') state.svKind = 'lab';
     if (saved.filt && typeof saved.filt === 'object') {
       if (['priority', 'eight', 'campus'].includes(saved.filt.sort)) state.filt.sort = saved.filt.sort;
     }
   }
+  useBranch(state.branch);
+  loadBranch(state.branchData[state.branch]);
   // drop slot picks that clash with each other (e.g. from a stale save)
   const keep = [];
   state.slotSel.forEach(nm => { if (!keep.includes(nm) && !keep.some(k => occOverlap(SLOTS.get(k).occ, SLOTS.get(nm).occ))) keep.push(nm); });
@@ -1023,9 +1356,9 @@ const state = {
 
 function save() {
   try {
+    state.branchData[state.branch] = branchSnapshot();
     localStorage.setItem(KEY, JSON.stringify({
-      view: state.view, cat: state.cat, mine: state.mine, page: state.page,
-      draft: state.draft && { id: state.draft.id, sec: state.draft.sec, labsOff: [...state.draft.labsOff] },
+      view: state.view, cat: state.cat, branch: state.branch, branches: state.branchData,
       slotSel: state.slotSel, svKind: state.svKind, filt: state.filt
     }));
   } catch (e) { /* storage unavailable: the page still works for this visit */ }
@@ -1842,6 +2175,42 @@ $('#view-slots').addEventListener('click', e => {
 }));
 $('#view-slots').addEventListener('mouseleave', () => setPreview(null));
 
+// branch switch
+function renderBranch() {
+  document.querySelectorAll('#branch [data-branch]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.branch === state.branch)));
+  $('#branch-note').textContent = state.branch + ' courses';
+}
+function applyRestoredPage() {
+  if (state.restorePage && state.vis.length) {
+    state.page = Math.min(state.restorePage, state.vis.length - 1);
+    renderResults();
+  }
+  state.restorePage = 0;
+  save();
+}
+function reportDropped() {
+  if (state.dropped.length) toast('Removed ' + andList(state.dropped) + ' because ' + (state.dropped.length > 1 ? 'their slots clash' : 'its slots clash') + ' with your other courses.');
+}
+function switchBranch(id) {
+  if (id === state.branch || !DATA[id]) return;
+  const prev = state.branch;
+  state.branchData[prev] = branchSnapshot();
+  state.branch = id;
+  useBranch(id);
+  loadBranch(state.branchData[id]);
+  state.q = '';
+  $('#course-search').value = '';
+  renderBranch();
+  renderAllPlanner();
+  applyRestoredPage();
+  if (state.dropped.length) reportDropped();
+  else toast('Showing ' + id + ' courses. Your ' + prev + ' list is saved.');
+}
+$('#branch').addEventListener('click', e => {
+  const b = e.target.closest('[data-branch]');
+  if (b) switchBranch(b.dataset.branch);
+});
+
 /* ======================================================================
    Boot
    ====================================================================== */
@@ -1850,14 +2219,11 @@ const h0 = location.hash.slice(1);
 if (h0 === 'slot-view') state.view = 'slots';
 else if (h0 === 'planner') state.view = 'planner';
 setView(state.view, true);
+renderBranch();
 renderAllPlanner();
-if (state.restorePage && state.vis.length) {
-  state.page = Math.min(state.restorePage, state.vis.length - 1);
-  renderResults();
-  save();
-}
+applyRestoredPage();
 renderSlotView();
-if (state.dropped.length) { save(); toast('Removed ' + andList(state.dropped) + ' because ' + (state.dropped.length > 1 ? 'their slots clash' : 'its slots clash') + ' with your other courses.'); }
+reportDropped();
 })();
 </script>
 <script data-goatcounter="https://slotbook.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

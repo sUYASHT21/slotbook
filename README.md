@@ -1,6 +1,6 @@
 # Slotbook
 
-An FFCS timetable planner for VIT, Winter Semester 2026–27.
+An FFCS timetable planner for VIT, Winter Semester 2026–27. It currently has the course lists for the **EEE** and **ECS** branches. Pick yours with the Branch switch at the top. Each branch keeps its own saved course list.
 
 **Live site:** https://suyasht21.github.io/slotbook/
 
@@ -12,7 +12,7 @@ An FFCS timetable planner for VIT, Winter Semester 2026–27.
 - Shows your theory classes per week and lab count, plus a copyable slot string like `A1+TA1+L33+L34`.
 
 **Timetable Planner**
-1. Pick a course from Discipline Core, Discipline Elective or Open Elective.
+1. Pick a course from Foundation Core, Discipline Core, Discipline Elective or Open Elective.
 2. Choose **one faculty and one theory slot**. If a faculty teaches both C1 and C2, they show up as two separate options, and you pick one. Every lab that goes with that slot is tried, and you can leave out individual labs.
 3. Courses that clash with ones you already added can't be added. The page names the clashing slots and the course that took them.
 4. Browse every clash-free timetable, one per lab combination. Sort by your course order, fewest 8 AM starts, or least time on campus.
@@ -38,7 +38,7 @@ Visits are counted with [GoatCounter](https://www.goatcounter.com), which uses n
 
 ## Updating course data
 
-Everything lives in `index.html`. Courses are in the `RAW` array inside the script. Each course lists its theory and lab sections as `[slot, venue, faculty]`:
+Everything lives in `index.html`. Each branch's courses are in its own array inside the script (`RAW_EEE`, `RAW_ECS`), and the Open Elective list shared by every branch is in `OPEN_ELECTIVES`. To add a branch, add its array and an entry in `BRANCHES`, plus a button in the Branch switch. Each course lists its theory and lab sections as `[slot, venue, faculty]`:
 
 ```js
 { id: 'BEEE303', cat: 'DC', kind: 'TH', name: 'Control Systems', codes: ['BEEE303L', 'BEEE303P'], labTitle: 'Control Systems Lab',

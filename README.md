@@ -13,7 +13,7 @@ An FFCS timetable planner for VIT, Winter Semester 2026–27. It currently has t
 
 **Timetable Planner**
 1. Pick a course from Foundation Core, Discipline Core, Discipline Elective or Open Elective.
-2. Choose **one faculty and one theory slot**. If a faculty teaches both C1 and C2, they show up as two separate options, and you pick one. Every lab that goes with that slot is tried, and you can leave out individual labs.
+2. Choose **one faculty and one theory slot**. If a faculty teaches both C1 and C2, they show up as two separate options, and you pick one. Every lab that goes with that slot is tried, and you can leave out individual labs. For courses with a lab, **Include the lab** is ticked by default; untick it to schedule only the theory, for example for a theory backlog.
 3. Courses that clash with ones you already added can't be added. The page names the clashing slots and the course that took them.
 4. Browse every clash-free timetable, one per lab combination. Sort by your course order, fewest 8 AM starts, or least time on campus.
 
@@ -46,7 +46,7 @@ Everything lives in `index.html`. Each branch's courses are in its own array ins
   labs: [['L33+L34', 'TT045', 'JANAKI M']] },
 ```
 
-`kind` is `TH` (theory, with an optional separate lab code), `ETH` (embedded theory + lab), `LO` (lab only) or `SS` (soft skill). `cat` is `DC`, `DE` or `OE`.
+`kind` is `TH` (theory, with an optional separate lab code), `ETH` (embedded theory + lab), `LO` (lab only) or `SS` (soft skill). `cat` is `FC`, `DC`, `DE` or `OE`.
 
 ## Deploying
 

@@ -196,6 +196,10 @@ button,input,select{font:inherit;color:inherit}
 .ed-cred{font-family:var(--font-hand);font-weight:700;font-size:1.9rem;line-height:1;text-align:right}
 .ed-cred small{display:block;font-family:var(--font-ui);font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
 .ed-note{margin:14px 0 10px}
+.lab-toggle{display:flex;align-items:center;gap:12px;margin-top:14px;padding:10px 14px;border:2px dashed var(--mint-ink);border-radius:12px 9px 12px 10px;background:var(--mint-soft);cursor:pointer}
+.lab-toggle.off{border-color:var(--ink-4);background:var(--sheet-2)}
+.lab-toggle b{display:block;font-weight:600;font-size:.92rem;line-height:1.25}
+.lab-toggle small{display:block;font-size:.78rem;color:var(--ink-2);line-height:1.3}
 .facs{display:grid;gap:10px}
 .fac{border:1.5px solid var(--rule);border-radius:12px 9px 12px 10px;background:var(--sheet);padding:12px 14px;transition:border-color .15s,background .15s}
 .fac:hover{border-color:var(--ink-3)}
@@ -766,6 +770,50 @@ const RAW_EEE = [
       ['D1+TD1', 'SJT222', 'FACE (APT)']],
     labs: [] },
 
+  // added from VTOP screenshots; names cut off in the screenshot end with an ellipsis
+  { id: 'BAEEE103', cat: 'DC', kind: 'ETH', name: 'Analog Electronics', codes: ['BAEEE103'],
+    theory: [
+      ['F2+TF2', 'TT414', 'ARUNKUMA…'],
+      ['F1+TF1', 'TT415', 'VENKATARA…'],
+      ['F1+TF1', 'TT413', 'WASHIMA T…'],
+      ['F1+TF1', 'TT414', 'GNANAVIGI…'],
+      ['F2+TF2', 'TT104', 'GNANAVIGI…']],
+    labs: [
+      ['L15+L16', 'TT129', 'ARUNKUMA…'],
+      ['L11+L12', 'TT129', 'ARUNKUMA…'],
+      ['L31+L32', 'TT129', 'VENKATARA…'],
+      ['L45+L46', 'TT129', 'VENKATARA…'],
+      ['L33+L34', 'TT129', 'WASHIMA T…'],
+      ['L51+L52', 'TT129', 'WASHIMA T…'],
+      ['L55+L56', 'TT129', 'GNANAVIGI…'],
+      ['L37+L38', 'TT129', 'GNANAVIGI…'],
+      ['L21+L22', 'TT129', 'GNANAVIGI…'],
+      ['L5+L6', 'TT129', 'GNANAVIGI…']] },
+  { id: 'BAEEE201', cat: 'DC', kind: 'ETH', name: 'Digital Electronics', codes: ['BAEEE201'],
+    theory: [
+      ['A1+TA1', 'TT404', 'VIJAYAKUMAR D'],
+      ['A1+TA1', 'TT413', 'SUDHAKAR N'],
+      ['A1+TA1', 'TT414', 'MALLIKARJUNA GOLLA'],
+      ['A2+TA2', 'TT413', 'MALLIKARJUNA GOLLA'],
+      ['A2+TA2', 'TT404', 'SHARMILA A']],
+    labs: [
+      ['L43+L44', 'TT128', 'VIJAYAKUMAR D'],
+      ['L57+L58', 'TT128', 'VIJAYAKUMAR D'],
+      ['L39+L40', 'TT128', 'SUDHAKAR N'],
+      ['L53+L54', 'TT128', 'SUDHAKAR N'],
+      ['L1+L2', 'TT128', 'SHARMILA A'],
+      ['L21+L22', 'TT128', 'SHARMILA A'],
+      ['L41+L42', 'TT128', 'MALLIKARJUNA GOLLA'],
+      ['L49+L50', 'TT128', 'MALLIKARJUNA GOLLA'],
+      ['L9+L10', 'TT128', 'MALLIKARJUNA GOLLA'],
+      ['L19+L20', 'TT128', 'MALLIKARJUNA GOLLA']] },
+  { id: 'BAEEE204', cat: 'DC', kind: 'TH', name: 'Electromagnetic Field Theory', codes: ['BAEEE204'],
+    theory: [
+      ['C2+TC2+TCC2', '', 'VENKATARA…'],
+      ['C1+TC1+TCC1', '', 'ANUSUYA B…'],
+      ['C2+TC2+TCC2', '', 'ANUSUYA B…'],
+      ['C1+TC1+TCC1', '', 'HIMADRI LA…']],
+    labs: [] },
   { id: 'BEEE302', cat: 'DC', kind: 'TH', name: 'Digital Signal Processing', codes: ['BEEE302L', 'BEEE302P'], labTitle: 'Digital Signal Processing Lab',
     theory: [
       ['G2+TG2', 'TT104', 'RAJINI G.K']],
@@ -1200,6 +1248,7 @@ function buildCourses(raw) {
     // credits: one per theory class (half for skills courses) plus one per 1h 40m lab block
     sections.forEach(s => {
       const th = s.theory ? (c.kind === 'SS' ? s.theory.occ.length / 2 : s.theory.occ.length) : 0;
+      s.thCredits = th;
       s.credits = th + (s.labs.length ? slotParts(s.labs[0].slot).length : 0);
     });
     const credits = (sections.find(s => !s.noLab) || sections[0]).credits;
@@ -1213,6 +1262,8 @@ let COURSES = DATA.EEE.list, COURSE = DATA.EEE.map;
 function useBranch(id) { COURSES = DATA[id].list; COURSE = DATA[id].map; }
 
 const kindLabel = c => c.kind === 'TH' ? (c.labs.length ? 'Theory + Lab' : 'Theory') : { ETH: 'Embedded', LO: 'Lab only', SS: 'Soft skill' }[c.kind];
+// courses with both a theory and a lab part, where the lab can be skipped (e.g. theory-only backlogs)
+const hasLab = c => c.theory.length > 0 && c.labs.length > 0;
 const kindCls = c => c.kind === 'TH' ? (c.labs.length ? 'thlab' : 'th') : c.kind.toLowerCase();
 const credTxt = n => (n % 1 ? n.toFixed(1) : String(n)) + (n === 1 ? ' credit' : ' credits');
 const credNum = n => (n % 1 ? n.toFixed(1) : String(n));
@@ -1294,7 +1345,7 @@ function normEntry(e, i) {
   const labKeys = c.secByKey[sec].labs.map(l => l.key);
   let labsOff = (Array.isArray(e.labsOff) ? e.labsOff : []).filter(k => labKeys.includes(k));
   if (labsOff.length >= labKeys.length) labsOff = [];
-  return { id: e.id, sec, color: Number.isInteger(e.color) ? ((e.color % 8) + 8) % 8 : i % 8, labsOff };
+  return { id: e.id, sec, color: Number.isInteger(e.color) ? ((e.color % 8) + 8) % 8 : i % 8, labsOff, skipLab: !!e.skipLab && hasLab(c) };
 }
 
 const state = {
@@ -1319,14 +1370,14 @@ function loadBranch(saved) {
   }
   if (saved.draft && typeof saved.draft === 'object' && COURSE[saved.draft.id]) {
     const de = normEntry(saved.draft, 0);
-    state.draft = { id: de.id, sec: de.sec, labsOff: new Set(de.labsOff), isNew: !state.mine.some(m => m.id === de.id) };
+    state.draft = { id: de.id, sec: de.sec, labsOff: new Set(de.labsOff), skipLab: de.skipLab, isNew: !state.mine.some(m => m.id === de.id) };
   }
   if (Number.isInteger(saved.page) && saved.page > 0) state.restorePage = saved.page;
 }
 
 const branchSnapshot = () => ({
   mine: state.mine, page: state.page,
-  draft: state.draft && { id: state.draft.id, sec: state.draft.sec, labsOff: [...state.draft.labsOff] }
+  draft: state.draft && { id: state.draft.id, sec: state.draft.sec, labsOff: [...state.draft.labsOff], skipLab: state.draft.skipLab }
 });
 
 (function restore() {
@@ -1375,7 +1426,7 @@ function entryOptions(entry) {
   const c = COURSE[entry.id];
   const s = c.secByKey[entry.sec];
   if (!s) return [];
-  if (!c.labs.length || s.noLab) return [{ entry, course: c, sec: s, lab: null, occ: s.theory.occ }];
+  if (!c.labs.length || s.noLab || (entry.skipLab && s.theory)) return [{ entry, course: c, sec: s, lab: null, occ: s.theory.occ }];
   const labsOff = new Set(entry.labsOff);
   return s.labs.filter(l => !labsOff.has(l.key))
     .map(l => ({ entry, course: c, sec: s, lab: l, occ: s.theory ? s.theory.occ.concat(l.occ) : l.occ }));
@@ -1383,7 +1434,7 @@ function entryOptions(entry) {
 
 function draftEntry() {
   const d = state.draft;
-  return { id: d.id, sec: d.sec, labsOff: [...d.labsOff] };
+  return { id: d.id, sec: d.sec, labsOff: [...d.labsOff], skipLab: d.skipLab };
 }
 
 function metrics(p) {
@@ -1391,7 +1442,7 @@ function metrics(p) {
   const first = Array(5).fill(99), last = Array(5).fill(-1), facs = [];
   p.forEach(o => {
     if (!o) return;
-    credits += o.sec.credits;
+    credits += o.lab ? o.sec.credits : o.sec.thCredits;
     facs.push(o.sec.fac.toLowerCase());
     if (o.sec.theory) { th += o.sec.theory.occ.length; if (o.sec.theory.half === 'm') m = true; else e = true; }
     if (o.lab) labs += slotParts(o.lab.slot).length;
@@ -1487,7 +1538,8 @@ function clashMessage(entry, others) {
 // Can this course be added at all (with any faculty) next to the current list?
 function canAdd(c) {
   const others = state.mine.filter(m => m.id !== c.id);
-  return c.sections.some(x => feasible(others.concat([{ id: c.id, sec: x.key, labsOff: [] }])));
+  return c.sections.some(x => feasible(others.concat([{ id: c.id, sec: x.key, labsOff: [] }])) ||
+    (hasLab(c) && feasible(others.concat([{ id: c.id, sec: x.key, labsOff: [], skipLab: true }]))));
 }
 
 function diagnose(opts) {
@@ -1610,11 +1662,13 @@ function openEditor(id, scroll) {
   const c = COURSE[id];
   const ex = state.mine.find(m => m.id === id);
   if (ex) {
-    state.draft = { id, sec: ex.sec, labsOff: new Set(ex.labsOff), isNew: false };
+    state.draft = { id, sec: ex.sec, labsOff: new Set(ex.labsOff), skipLab: ex.skipLab, isNew: false };
   } else {
     // start on the first faculty + slot that fits next to the current courses
-    const s = c.sections.find(x => feasible(state.mine.concat([{ id, sec: x.key, labsOff: [] }]))) || c.sections[0];
-    state.draft = { id, sec: s.key, labsOff: new Set(), isNew: true };
+    // the lab is included by default; fall back to a section that fits theory-only, then the first one
+    const fits = skipLab => c.sections.find(x => feasible(state.mine.concat([{ id, sec: x.key, labsOff: [], skipLab }])));
+    const s = fits(false) || (hasLab(c) && fits(true)) || c.sections[0];
+    state.draft = { id, sec: s.key, labsOff: new Set(), skipLab: false, isNew: true };
   }
   renderEditor();
   renderCourseList();
@@ -1626,11 +1680,12 @@ function labsHTML(c, s, sel) {
   const d = state.draft;
   let h = '<div class="opt-labs"><span class="lbl">Lab</span>';
   if (s.noLab) return h + '<span class="warn">No lab listed for this faculty, so only the theory is scheduled</span></div>';
+  if (d.skipLab) return h + '<span class="muted">Skipped, theory only</span></div>';
   h += s.labs.map(l => {
     const lo = sel && d.labsOff.has(l.key);
     const inner = l.slot + '<small>' + l.occ.map(o => DAYS[o[0]] + ' ' + fmtShort(o[1])).join(' · ') + '</small>';
     const title = esc(l.slot + ' · ' + whenLong(l.slot) + ' · ' + l.venue);
-    return sel && s.labs.length > 1
+    return sel && s.labs.length > 1 && !d.skipLab
       ? '<button type="button" class="lab-chip' + (lo ? ' off' : '') + '" data-lab="' + esc(l.key) + '" aria-pressed="' + !lo + '" title="' + title + (lo ? ' (left out)' : '') + '">' + inner + '</button>'
       : '<span class="lab-chip" title="' + title + '">' + inner + '</span>';
   }).join('');
@@ -1657,7 +1712,7 @@ function renderEditor() {
     const opts = secs.map(s => {
       const idx = c.sections.indexOf(s);
       const sel = s.key === d.sec;
-      const msg = clashMessage(sel ? draftEntry() : { id: c.id, sec: s.key, labsOff: [] }, others);
+      const msg = clashMessage(sel ? draftEntry() : { id: c.id, sec: s.key, labsOff: [], skipLab: d.skipLab }, others);
       if (sel) selMsg = msg;
       if (!msg) fitN++;
       const id = 'opt-' + c.id + '-' + idx;
@@ -1668,7 +1723,7 @@ function renderEditor() {
         '<label class="opt-top" for="' + id + '"><input type="radio" class="radio" name="sec-' + c.id + '" id="' + id + '" value="' + idx + '"' + (sel ? ' checked' : '') + '>' +
         '<span class="opt-line"><span class="slot-chip ' + (s.theory ? s.theory.half : 'lab') + '">' + main.slot + '</span><span>' + esc(main.venue) + '</span><span>' + when + '</span></span>' + fit + '</label>' +
         labsHTML(c, s, sel) +
-        (sel && s.theory && s.labs.length > 1 ? '<p class="fac-hint">All ' + s.labs.length + ' labs are tried. Tap one to leave it out.</p>' : '') +
+        (sel && s.theory && s.labs.length > 1 && !d.skipLab ? '<p class="fac-hint">All ' + s.labs.length + ' labs are tried. Tap one to leave it out.</p>' : '') +
         (msg ? '<p class="clash-msg">' + esc(msg) + '</p>' : '') +
         '</div>';
     }).join('');
@@ -1679,12 +1734,19 @@ function renderEditor() {
 
   const total = c.sections.length;
   const sub = c.labTitle ? 'Lab: ' + esc(c.labTitle) : '';
-  const fix = fitN ? ' Pick an option marked Fits instead.' : ' Remove the clashing course first if you want this one.';
+  let fix = fitN ? ' Pick an option marked Fits instead.' : ' Remove the clashing course first if you want this one.';
+  if (selMsg && hasLab(c) && !d.skipLab && !clashMessage(Object.assign(draftEntry(), { skipLab: true }), others)) fix += ' Or untick “Include the lab” if you only need the theory.';
+  const labToggle = hasLab(c)
+    ? '<label class="lab-toggle' + (d.skipLab ? ' off' : '') + '" for="lab-on-' + c.id + '"><input type="checkbox" class="tick lab-on" id="lab-on-' + c.id + '"' + (d.skipLab ? '' : ' checked') + '>' +
+      '<span><b>Include the lab</b><small>' + (d.skipLab ? 'Only the theory is scheduled. Tick to add the lab back.' : 'Untick if you only need the theory, for example for a backlog.') + '</small></span></label>'
+    : '';
+  const shownCredits = d.skipLab && hasLab(c) ? c.secByKey[d.sec].thCredits : c.credits;
   el.innerHTML =
     '<div class="ed-head"><div><div class="ed-codes">' + c.codes.join(' + ') + ' · ' + CATS.find(x => x.id === c.cat).name + '</div><h3>' + esc(c.name) + '</h3>' +
       '<div class="ed-tags"><span class="tag ' + kindCls(c) + '">' + kindLabel(c) + '</span>' + (sub ? '<span>' + sub + '</span>' : '') + '</div></div>' +
-      '<div class="ed-cred">' + credNum(c.credits) + '<small>credits</small></div></div>' +
-    '<p class="note ed-note">' + (isLabOnly ? 'Pick one lab slot.' : 'Pick one faculty and one theory slot. Every lab that goes with that slot is tried.') + '</p>' +
+      '<div class="ed-cred">' + credNum(shownCredits) + '<small>credits</small></div></div>' +
+    labToggle +
+    '<p class="note ed-note">' + (isLabOnly ? 'Pick one lab slot.' : d.skipLab ? 'Pick one faculty and one theory slot. The lab is skipped.' : 'Pick one faculty and one theory slot. Every lab that goes with that slot is tried.') + '</p>' +
     '<div class="facs" role="radiogroup" aria-label="Faculty and slot">' + cards + '</div>' +
     (selMsg ? '<div class="clash-box"><span class="hand">Slot clash!</span><span>' + esc(selMsg) + (others.length ? fix : '') + '</span></div>' : '') +
     '<div class="ed-foot">' +
@@ -1725,6 +1787,11 @@ function commitDraft() {
 /* ======================================================================
    Planner: step 3 (your courses)
    ====================================================================== */
+const entryCredits = e => {
+  const s = COURSE[e.id].secByKey[e.sec];
+  return e.skipLab && s.theory ? s.thCredits : s.credits;
+};
+
 function renderMine() {
   const ol = $('#mine-list');
   if (!state.mine.length) {
@@ -1741,8 +1808,8 @@ function renderMine() {
         '<span class="sw" aria-hidden="true"></span>' +
         '<div class="mine-body"><div class="mine-codes">' + c.codes.join(' + ') + '</div><div class="mine-name">' + esc(c.name) + '</div>' +
           '<div class="mine-sub"><span>' + esc(sec.fac) + '</span><span class="slot-chip ' + (sec.theory ? sec.theory.half : 'lab') + '">' + main.slot + '</span>' +
-            (labs.length ? '<span>Lab ' + labs.join(' or ') + '</span>' : '') + '</div></div>' +
-        '<span class="mine-cred">' + credNum(sec.credits) + ' cr</span>' +
+            (labs.length ? '<span>Lab ' + labs.join(' or ') + '</span>' : e.skipLab ? '<span class="tag">Theory only</span>' : '') + '</div></div>' +
+        '<span class="mine-cred">' + credNum(entryCredits(e)) + ' cr</span>' +
         '<div class="mine-actions">' +
           '<button type="button" class="icon-btn" data-act="edit" aria-label="Edit ' + esc(c.name) + '">' + ic('edit') + '</button>' +
           '<button type="button" class="icon-btn" data-act="up" aria-label="Move up"' + (i === 0 ? ' disabled' : '') + '>' + ic('up') + '</button>' +
@@ -1755,7 +1822,7 @@ function renderMine() {
 }
 
 function renderMineFoot() {
-  const total = state.mine.reduce((a, e) => a + COURSE[e.id].secByKey[e.sec].credits, 0);
+  const total = state.mine.reduce((a, e) => a + entryCredits(e), 0);
   $('#total').innerHTML = credNum(total) + ' credits<small>' + state.mine.length + (state.mine.length === 1 ? ' course' : ' courses') + '</small>';
   const n = state.results.length;
   $('#see-results').innerHTML = (n ? 'See ' + n + (state.truncated ? '+' : '') + (n === 1 ? ' timetable' : ' timetables') : 'See timetables') + ic('down2');
@@ -1841,6 +1908,7 @@ function renderResults() {
     let slots = '';
     if (o.sec.theory) slots += '<span class="slot-chip ' + o.sec.theory.half + '">' + o.sec.theory.slot + '</span><span>' + esc(o.sec.theory.venue) + '</span>';
     if (o.lab) slots += '<span class="slot-chip lab">' + o.lab.slot + '</span><span>' + esc(o.lab.venue) + '</span>';
+    else if (hasLab(c)) slots += '<span class="tag">Theory only</span>';
     return '<li style="--c:var(--c' + (e.color + 1) + ')"><span class="sw"></span><div><div class="lg-code">' + c.codes.join(' + ') + '</div><div class="lg-name">' + esc(c.name) + '</div>' +
       '<div class="lg-fac">' + esc(o.sec.fac) + '</div><div class="lg-slots">' + slots + '</div></div></li>';
   }).join('');
@@ -2035,8 +2103,15 @@ $('#course-list').addEventListener('click', e => {
 
 // step 2
 $('#editor').addEventListener('change', e => {
-  if (!e.target.classList.contains('radio')) return;
   const d = state.draft;
+  if (e.target.classList.contains('lab-on')) {
+    d.skipLab = !e.target.checked;
+    renderEditor();
+    const again = document.getElementById(e.target.id);
+    if (again) again.focus();
+    return;
+  }
+  if (!e.target.classList.contains('radio')) return;
   const s = COURSE[d.id].sections[+e.target.value];
   if (!s || s.key === d.sec) return;
   d.sec = s.key;
